@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { PlexFriend, PlexShare } from '../clients/plextv';
+import { inviteCoversServer, type PlexFriend, type PlexInvite, type PlexShare } from '../clients/plextv';
 import type { TautulliUser } from '../clients/tautulli';
 import { openTestDb } from '../db/migrate';
 import { people, plexShares } from '../db/schema';
@@ -49,12 +49,24 @@ function sources(over: Partial<PeopleSources> = {}): PeopleSources {
     friends: [friend('2', 'ann'), friend('3', 'bob'), friend('4', 'kid', { home: true, server: null })],
     shares: [share('2', true), share('3', false)],
     invites: [
-      { id: '77', email: 'new@example.com', username: null, friendlyName: null, thumb: null, createdAt: 3000, servers: [] },
+      { id: '77', email: 'new@example.com', username: null, friendlyName: null, thumb: null, createdAt: 3000, servers: [{ machineId: null, name: 'Home' }] },
     ],
     libraries: [{ section_id: '1', section_name: 'Movies', section_type: 'movie', count: 10, is_active: true }],
     ...over,
   };
 }
+
+describe('inviteCoversServer', () => {
+  const inv = (servers: PlexInvite['servers']): PlexInvite => ({ id: '1', email: null, username: null, friendlyName: null, thumb: null, createdAt: null, servers });
+  const ours = { machineId: 'abc', name: 'Home' };
+  it('matches by machine id, else by name', () => {
+    expect(inviteCoversServer(inv([{ machineId: 'abc', name: 'Other' }]), ours)).toBe(true);
+    expect(inviteCoversServer(inv([{ machineId: 'zzz', name: 'Home' }]), ours)).toBe(false);
+    expect(inviteCoversServer(inv([{ machineId: null, name: 'Home' }]), ours)).toBe(true);
+    expect(inviteCoversServer(inv([{ machineId: null, name: 'Elsewhere' }]), ours)).toBe(false);
+    expect(inviteCoversServer(inv([]), ours)).toBe(true);
+  });
+});
 
 describe('applyPeopleSync', () => {
   it('derives status from plex.tv and skips Tautulli’s Local user', () => {

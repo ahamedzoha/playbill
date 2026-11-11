@@ -261,8 +261,14 @@ export interface PlexInvite {
   friendlyName: string | null;
   thumb: string | null;
   createdAt: number | null;
-  /** Machine ids of servers the invite covers. */
-  servers: string[];
+  /** Servers the invite covers. plex.tv often sends only the server's name, no machine id. */
+  servers: { machineId: string | null; name: string | null }[];
+}
+
+/** True when an invite covers our server (by machine id when given, else by server name). */
+export function inviteCoversServer(invite: PlexInvite, server: { machineId: string; name: string }): boolean {
+  if (invite.servers.length === 0) return true;
+  return invite.servers.some((s) => (s.machineId ? s.machineId === server.machineId : s.name === server.name));
 }
 
 /** Invites the owner sent that haven't been accepted yet. */
@@ -276,6 +282,9 @@ export async function getPendingInvites(clientId: string, token: string): Promis
     friendlyName: i.friendlyName ? String(i.friendlyName) : null,
     thumb: i.thumb ? String(i.thumb) : null,
     createdAt: epochMs(i.createdAt),
-    servers: list<Record<string, string>>(i.Server).map((s) => String(s.machineIdentifier ?? s.id ?? '')),
+    servers: list<Record<string, string>>(i.Server).map((s) => ({
+      machineId: s.machineIdentifier ? String(s.machineIdentifier) : null,
+      name: s.name ? String(s.name) : null,
+    })),
   }));
 }

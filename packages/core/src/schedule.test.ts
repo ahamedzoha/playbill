@@ -37,6 +37,11 @@ describe('dueOccurrence', () => {
     expect(r.occurrence).toBeNull();
   });
 
+  it('reports no skipped runs for a schedule that never ran', () => {
+    const r = dueOccurrence('*/15 * * * *', 'UTC', null, at('2026-11-11T12:07:00Z'), 6 * H);
+    expect(r).toEqual({ occurrence: at('2026-11-11T12:00:00Z'), skipped: 0 });
+  });
+
   it('honours the timezone', () => {
     // 19:00 in Dhaka (UTC+6) is 13:00 UTC.
     expect(nextOccurrence('0 19 * * *', 'Asia/Dhaka', at('2026-11-11T00:00:00Z'))).toBe(at('2026-11-11T13:00:00Z'));

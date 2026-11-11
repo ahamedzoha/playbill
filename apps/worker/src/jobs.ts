@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { config, logger } from '@playbill/core';
 import { pruneSessions } from '@playbill/core/auth';
 import { backupDatabase, dateLabel, pruneBackups } from '@playbill/core/backup';
-import { getFriends, getPendingInvites, getShares } from '@playbill/core/clients/plextv';
+import { getFriends, getPendingInvites, getShares, inviteCoversServer } from '@playbill/core/clients/plextv';
 import { tautulliReader } from '@playbill/core/clients/tautulli';
 import { getSqlite, type Db } from '@playbill/core/db';
 import { libraries } from '@playbill/core/db/schema';
@@ -56,7 +56,7 @@ async function syncPeople(db: Db): Promise<void> {
     tautulliTable,
     friends,
     shares,
-    invites: invites.filter((i) => i.servers.length === 0 || i.servers.includes(plex.machineId)),
+    invites: invites.filter((i) => inviteCoversServer(i, plex)),
     libraries: libs,
   });
   refreshLastPlayed(db);

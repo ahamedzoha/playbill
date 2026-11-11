@@ -36,9 +36,11 @@ export function dueOccurrence(
     latest = next.getTime();
     cursor = next;
   }
+  // A schedule that never ran has nothing to "miss": only report skips after real downtime.
+  const report = (n: number) => (lastOccurrence === null ? 0 : n);
   if (latest === null) return { occurrence: null, skipped: 0 };
-  if (now - latest > graceMs) return { occurrence: null, skipped: skipped + 1 };
-  return { occurrence: latest, skipped };
+  if (now - latest > graceMs) return { occurrence: null, skipped: report(skipped + 1) };
+  return { occurrence: latest, skipped: report(skipped) };
 }
 
 export function nextOccurrence(pattern: string, timezone: string, after: number): number | null {
