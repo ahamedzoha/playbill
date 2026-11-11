@@ -5,7 +5,7 @@ import { createSession, findAdmin, hasOwner, upsertAdmin } from '@playbill/core/
 import { checkPin, getAccount, getServers } from '@playbill/core/clients/plextv';
 import { crypto } from '@playbill/core/crypto';
 import { instanceClientId, setSetting } from '@playbill/core/settings';
-import { advanceSetup } from '@playbill/core/setup';
+import { advanceSetup, clearSetupCode } from '@playbill/core/setup';
 import { SETUP_COOKIE, db, handle, jsonError, setSessionCookie } from '@/lib/server';
 
 const body = z.object({ id: z.number().int() });
@@ -48,6 +48,7 @@ export const POST = handle(async (req: NextRequest) => {
       upsertAdmin(d, { ...profile, role: 'owner' });
       setSetting(d, 'owner', { plexUserId, username: profile.username, tokenEnc: crypto().encrypt(token) });
       advanceSetup(d, 2);
+      clearSetupCode(d);
     });
     audit(d, { actor: profile.username, action: 'setup.owner', target: plexUserId });
     next = '/setup';

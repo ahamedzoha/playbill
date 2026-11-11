@@ -1,9 +1,11 @@
 import { randomInt } from 'node:crypto';
-import { writeFileSync } from 'node:fs';
+import { rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { eq } from 'drizzle-orm';
 import { hasOwner } from './auth';
 import { config } from './config';
 import type { Db } from './db';
+import { settings } from './db/schema';
 import { safeEqual } from './ids';
 import { getSetting, setSetting, setupState } from './settings';
 
@@ -30,7 +32,10 @@ function canonical(code: string): string {
  * to `<config>/setup-code.txt`. Returns null once an owner exists.
  */
 export function ensureSetupCode(db: Db): string | null {
-  if (hasOwner(db)) return null;
+  if (hasOwner(db)) {
+    clearSetupCode(db);
+    return null;
+  }
   let code = getSetting(db, 'setupCode')?.code;
   if (!code) {
     code = makeCode();
@@ -42,6 +47,12 @@ export function ensureSetupCode(db: Db): string | null {
     // Not fatal: the code is also printed in the logs.
   }
   return code;
+}
+
+/** Once an owner exists the code has done its job: forget it and remove the file. */
+export function clearSetupCode(db: Db): void {
+  db.delete(settings).where(eq(settings.key, 'setupCode')).run();
+  rmSync(join(config().configDir, 'setup-code.txt'), { force: true });
 }
 
 export function checkSetupCode(db: Db, input: string): boolean {
