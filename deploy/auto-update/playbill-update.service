@@ -1,0 +1,10 @@
+[Unit]
+Description=Update Playbill to the newest image for its tag
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+# Change to the folder that holds your compose file.
+Environment=PLAYBILL_COMPOSE_DIR=/opt/playbill
+ExecStart=/usr/local/sbin/playbill-update.sh

@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config, errorMessage, logger } from '@playbill/core';
 import { backupDatabase } from '@playbill/core/backup';
+import { crypto } from '@playbill/core/crypto';
 import { getDb, getSqlite, openSqlite } from '@playbill/core/db';
 import { migrationsDir, pendingMigrations, runMigrations } from '@playbill/core/db/migrate';
 import { HEARTBEAT_MS, beat } from '@playbill/core/health';
@@ -46,6 +47,8 @@ async function main(): Promise<void> {
 
   const db = getDb();
   instanceClientId(db);
+  // Create secret.key at boot (not on first use) so backups of /config always include it.
+  crypto();
   const setupCode = ensureSetupCode(db);
   if (setupCode) {
     log.info('──────────────────────────────────────────────');
