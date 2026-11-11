@@ -9,7 +9,9 @@ import { migrationsDir, pendingMigrations, runMigrations } from '@playbill/core/
 import { HEARTBEAT_MS, beat } from '@playbill/core/health';
 import { Queue } from '@playbill/core/queue';
 import { instanceClientId } from '@playbill/core/settings';
-import { ensureSetupCode } from '@playbill/core/setup';
+import { ensureSetupCode, isSetupComplete } from '@playbill/core/setup';
+import { syncState } from '@playbill/core/db/schema';
+import { eq } from 'drizzle-orm';
 import { handlers } from './jobs';
 import { Scheduler } from './scheduler';
 
@@ -68,6 +70,13 @@ async function main(): Promise<void> {
       log.error('heartbeat failed', { error: errorMessage(err) });
     }
   }, HEARTBEAT_MS);
+
+  // First start after setup (or after an upgrade that added syncing): import everything now
+  // rather than waiting for the schedule.
+  if (isSetupComplete(db) && !db.select().from(syncState).where(eq(syncState.name, 'history')).get()) {
+    queue.enqueue('sync.people', {}, { dedupeKey: 'schedule:sync.people' });
+    queue.enqueue('sync.history', {}, { dedupeKey: 'schedule:sync.history', runAt: Date.now() + 5_000 });
+  }
 
   const scheduler = new Scheduler(db, queue);
   scheduler.start();

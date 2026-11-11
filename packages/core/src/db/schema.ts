@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 /** Times are epoch milliseconds throughout. */
 
@@ -136,3 +136,122 @@ export const auditLog = sqliteTable(
   },
   (t) => [index('audit_at_idx').on(t.at)],
 );
+
+// ---------------------------------------------------------------------------------------------
+// People and activity (P1). Synced from Tautulli and plex.tv; Playbill-only fields are marked.
+
+/**
+ * Everyone who has (or had) access to the server, keyed by Plex account id.
+ * `status` is derived on every sync from plex.tv: owner, shared, pending (invited, not accepted),
+ * home (Plex Home member), removed (in Tautulli history but no longer shared).
+ */
+export const people = sqliteTable(
+  'people',
+  {
+    plexUserId: text('plex_user_id').primaryKey(),
+    username: text('username').notNull(),
+    /** Tautulli's friendly name (editable there), else the Plex title. */
+    displayName: text('display_name').notNull(),
+    email: text('email'),
+    thumb: text('thumb'),
+    status: text('status', { enum: ['owner', 'shared', 'pending', 'home', 'removed'] }).notNull(),
+    invitedAt: integer('invited_at'),
+    acceptedAt: integer('accepted_at'),
+    /** plex.tv's last-seen for this user on our server (any client, including browsing). */
+    plexLastSeenAt: integer('plex_last_seen_at'),
+    /** Last play recorded by Tautulli. */
+    lastPlayedAt: integer('last_played_at'),
+    /** Tautulli's own flag for whether this user receives Tautulli notifications. */
+    tautulliNotify: integer('tautulli_notify', { mode: 'boolean' }),
+    /** Playbill-only: never nudge, warn or remove this person. */
+    exempt: integer('exempt', { mode: 'boolean' }).notNull().default(false),
+    /** Playbill-only: free-text admin note. */
+    note: text('note'),
+    firstSeenAt: integer('first_seen_at').notNull(),
+    removedAt: integer('removed_at'),
+    syncedAt: integer('synced_at').notNull(),
+  },
+  (t) => [index('people_status_idx').on(t.status), index('people_last_played_idx').on(t.lastPlayedAt)],
+);
+
+/** plex.tv share state per person: which libraries, which permissions. Snapshot for undo lives in lifecycle (P4). */
+export const plexShares = sqliteTable('plex_shares', {
+  plexUserId: text('plex_user_id')
+    .primaryKey()
+    .references(() => people.plexUserId, { onDelete: 'cascade' }),
+  shareId: text('share_id'),
+  allLibraries: integer('all_libraries', { mode: 'boolean' }).notNull(),
+  sectionIds: text('section_ids', { mode: 'json' }).$type<string[]>().notNull(),
+  allowSync: integer('allow_sync', { mode: 'boolean' }).notNull(),
+  filters: text('filters', { mode: 'json' }).$type<Record<string, string>>(),
+  pending: integer('pending', { mode: 'boolean' }).notNull().default(false),
+  syncedAt: integer('synced_at').notNull(),
+});
+
+export const libraries = sqliteTable('libraries', {
+  sectionId: text('section_id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type').notNull(),
+  itemCount: integer('item_count'),
+  active: integer('active', { mode: 'boolean' }).notNull().default(true),
+  syncedAt: integer('synced_at').notNull(),
+});
+
+/**
+ * Local copy of Tautulli history, one row per play as Tautulli groups them.
+ * Keyed by Tautulli's `reference_id` (the first session of a group), which stays stable while a
+ * group grows; rows are upserted so a resumed play updates its duration.
+ */
+export const watchHistory = sqliteTable(
+  'watch_history',
+  {
+    id: integer('id').primaryKey(),
+    plexUserId: text('plex_user_id').notNull(),
+    startedAt: integer('started_at').notNull(),
+    stoppedAt: integer('stopped_at'),
+    /** Seconds actually watched (excludes pauses). */
+    playSeconds: integer('play_seconds').notNull(),
+    percentComplete: integer('percent_complete'),
+    /** 1 watched, 0.5 partial, 0 barely started (Tautulli's watched_status). */
+    watched: real('watched'),
+    mediaType: text('media_type').notNull(),
+    sectionId: text('section_id'),
+    ratingKey: text('rating_key'),
+    parentRatingKey: text('parent_rating_key'),
+    grandparentRatingKey: text('grandparent_rating_key'),
+    title: text('title').notNull(),
+    parentTitle: text('parent_title'),
+    grandparentTitle: text('grandparent_title'),
+    fullTitle: text('full_title'),
+    year: integer('year'),
+    seasonNumber: integer('season_number'),
+    episodeNumber: integer('episode_number'),
+    guid: text('guid'),
+    thumb: text('thumb'),
+    platform: text('platform'),
+    player: text('player'),
+    product: text('product'),
+    ipAddress: text('ip_address'),
+    /** direct play, copy (direct stream) or transcode. */
+    transcodeDecision: text('transcode_decision'),
+    location: text('location'),
+    relayed: integer('relayed', { mode: 'boolean' }),
+    live: integer('live', { mode: 'boolean' }),
+  },
+  (t) => [
+    index('wh_user_started_idx').on(t.plexUserId, t.startedAt),
+    index('wh_started_idx').on(t.startedAt),
+    index('wh_grandparent_idx').on(t.grandparentRatingKey),
+    index('wh_section_idx').on(t.sectionId),
+  ],
+);
+
+/** Progress of each sync, so a restart resumes instead of starting over. */
+export const syncState = sqliteTable('sync_state', {
+  name: text('name').primaryKey(),
+  /** Free-form cursor, e.g. { backfillDone: true, newestStartedAt: 123 }. */
+  cursor: text('cursor', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
+  lastRunAt: integer('last_run_at'),
+  lastOkAt: integer('last_ok_at'),
+  lastError: text('last_error'),
+});

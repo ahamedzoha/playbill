@@ -3,6 +3,7 @@ import type { Db } from '@playbill/core/db';
 import type { Queue } from '@playbill/core/queue';
 import { dueOccurrence, lastOccurrenceOf, markOccurrence } from '@playbill/core/schedule';
 import { getSetting } from '@playbill/core/settings';
+import { isSetupComplete } from '@playbill/core/setup';
 
 const log = logger('scheduler');
 
@@ -10,12 +11,16 @@ interface BuiltIn {
   name: string;
   cron: string;
   job: string;
+  /** Only runs once the setup wizard has finished (needs Plex + Tautulli). */
+  needsSetup?: boolean;
 }
 
 /** Housekeeping that every install runs. Campaign schedules join this loop in a later phase. */
 const BUILT_IN: BuiltIn[] = [
   { name: 'backup', cron: '30 3 * * *', job: 'backup' },
   { name: 'maintenance', cron: '15 4 * * *', job: 'maintenance' },
+  { name: 'sync.people', cron: '7 */6 * * *', job: 'sync.people', needsSetup: true },
+  { name: 'sync.history', cron: '*/15 * * * *', job: 'sync.history', needsSetup: true },
 ];
 
 export const TICK_MS = 30_000;
@@ -35,7 +40,9 @@ export class Scheduler {
   /** Enqueues every schedule that has an occurrence due. Safe to call at any time. */
   tick(now = Date.now()): void {
     const tz = this.timezone();
+    const ready = isSetupComplete(this.db);
     for (const s of BUILT_IN) {
+      if (s.needsSetup && !ready) continue;
       try {
         const due = dueOccurrence(s.cron, tz, lastOccurrenceOf(this.db, s.name), now);
         if (due.skipped > 0) log.warn(`skipped ${due.skipped} missed run(s) of ${s.name}`);

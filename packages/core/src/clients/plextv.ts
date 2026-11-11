@@ -1,3 +1,4 @@
+import { XMLParser } from 'fast-xml-parser';
 import { z } from 'zod';
 import { HttpError, requestJson } from './http';
 
@@ -144,4 +145,137 @@ export async function findWorkingConnection(
   const winner = results.find((r) => r.ok);
   if (!winner) throw Object.assign(new Error('No connection to this Plex server worked'), { tried: results });
   return { url: winner.url, tried: results };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Sharing (read side). These plex.tv endpoints answer XML only.
+
+const xml = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', parseAttributeValue: false });
+
+async function requestXml(url: string, clientId: string, token: string): Promise<Record<string, unknown>> {
+  let res: Response;
+  try {
+    res = await fetch(url, { headers: plexHeaders(clientId, token), signal: AbortSignal.timeout(30_000) });
+  } catch (err) {
+    throw new HttpError(`Could not reach plex.tv: ${err instanceof Error ? err.message : String(err)}`, null, url);
+  }
+  if (!res.ok) throw new HttpError(`${res.status} ${res.statusText} from ${url}`, res.status, url);
+  return xml.parse(await res.text()) as Record<string, unknown>;
+}
+
+/** XML lists come back as an object when there is one child and an array when there are more. */
+function list<T>(value: unknown): T[] {
+  if (value === undefined || value === null || value === '') return [];
+  return (Array.isArray(value) ? value : [value]) as T[];
+}
+
+const bool = (v: unknown) => v === '1' || v === 'true' || v === true;
+const epochMs = (v: unknown) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n * 1000 : null;
+};
+
+export interface PlexFriend {
+  id: string;
+  username: string;
+  title: string;
+  email: string | null;
+  thumb: string | null;
+  home: boolean;
+  restricted: boolean;
+  allowSync: boolean;
+  filters: Record<string, string>;
+  /** Present when this friend has access to (or a pending invite for) our server. */
+  server: { pending: boolean; lastSeenAt: number | null; allLibraries: boolean; numLibraries: number } | null;
+}
+
+/** Everyone in the owner's friends and Plex Home, with their state on `machineId`. */
+export async function getFriends(clientId: string, token: string, machineId: string): Promise<PlexFriend[]> {
+  const doc = await requestXml('https://plex.tv/api/users', clientId, token);
+  const users = list<Record<string, unknown>>((doc.MediaContainer as Record<string, unknown> | undefined)?.User);
+  return users.map((u) => {
+    const server = list<Record<string, string>>(u.Server).find((s) => s.machineIdentifier === machineId);
+    return {
+      id: String(u.id),
+      username: String(u.username ?? ''),
+      title: String(u.title ?? u.username ?? ''),
+      email: u.email ? String(u.email) : null,
+      thumb: u.thumb ? String(u.thumb) : null,
+      home: bool(u.home),
+      restricted: bool(u.restricted),
+      allowSync: bool(u.allowSync),
+      filters: Object.fromEntries(
+        ['filterAll', 'filterMovies', 'filterMusic', 'filterPhotos', 'filterTelevision']
+          .filter((k) => u[k])
+          .map((k) => [k, String(u[k])]),
+      ),
+      server: server
+        ? {
+            pending: bool(server.pending),
+            lastSeenAt: epochMs(server.lastSeenAt),
+            allLibraries: bool(server.allLibraries),
+            numLibraries: Number(server.numLibraries ?? 0),
+          }
+        : null,
+    };
+  });
+}
+
+export interface PlexShare {
+  shareId: string;
+  userId: string;
+  username: string;
+  email: string | null;
+  invitedAt: number | null;
+  acceptedAt: number | null;
+  allLibraries: boolean;
+  allowSync: boolean;
+  /** Section ids (library keys on our server) this person can see. */
+  sectionIds: string[];
+}
+
+/** Per-library shares on our server, including invite and accept times. */
+export async function getShares(clientId: string, token: string, machineId: string): Promise<PlexShare[]> {
+  const doc = await requestXml(`https://plex.tv/api/servers/${machineId}/shared_servers`, clientId, token);
+  const shares = list<Record<string, unknown>>((doc.MediaContainer as Record<string, unknown> | undefined)?.SharedServer);
+  return shares.map((s) => ({
+    shareId: String(s.id),
+    userId: String(s.userID),
+    username: String(s.username ?? ''),
+    email: s.email ? String(s.email) : null,
+    invitedAt: epochMs(s.invitedAt),
+    acceptedAt: epochMs(s.acceptedAt),
+    allLibraries: bool(s.allLibraries),
+    allowSync: bool(s.allowSync),
+    sectionIds: list<Record<string, string>>(s.Section)
+      .filter((sec) => bool(sec.shared))
+      .map((sec) => String(sec.key)),
+  }));
+}
+
+export interface PlexInvite {
+  id: string;
+  email: string | null;
+  username: string | null;
+  friendlyName: string | null;
+  thumb: string | null;
+  createdAt: number | null;
+  /** Machine ids of servers the invite covers. */
+  servers: string[];
+}
+
+/** Invites the owner sent that haven't been accepted yet. */
+export async function getPendingInvites(clientId: string, token: string): Promise<PlexInvite[]> {
+  const doc = await requestXml('https://plex.tv/api/invites/requested', clientId, token);
+  const invites = list<Record<string, unknown>>((doc.MediaContainer as Record<string, unknown> | undefined)?.Invite);
+  return invites.map((i) => ({
+    id: String(i.id),
+    email: i.email ? String(i.email) : null,
+    username: i.username ? String(i.username) : null,
+    friendlyName: i.friendlyName ? String(i.friendlyName) : null,
+    thumb: i.thumb ? String(i.thumb) : null,
+    createdAt: epochMs(i.createdAt),
+    servers: list<Record<string, string>>(i.Server).map((s) => String(s.machineIdentifier ?? s.id ?? '')),
+  }));
 }

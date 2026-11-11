@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { audit } from '@playbill/core/audit';
 import { TautulliClient } from '@playbill/core/clients/tautulli';
 import { saveIntegration } from '@playbill/core/integrations';
+import { Queue } from '@playbill/core/queue';
 import { getSetting } from '@playbill/core/settings';
 import { advanceSetup } from '@playbill/core/setup';
 import { currentOwner, db, handle, jsonError } from '@/lib/server';
@@ -41,6 +42,10 @@ export const POST = handle(async (req: NextRequest) => {
   const message = `Tautulli ${info.version}`;
   saveIntegration(d, { kind: 'tautulli', name: 'Tautulli', baseUrl: parsed.data.url, apiKey: parsed.data.apiKey }, { ok: true, message });
   advanceSetup(d, 4, true);
+  // Import people and history right away instead of waiting for the schedule.
+  const queue = new Queue(d);
+  queue.enqueue('sync.people', {}, { dedupeKey: 'schedule:sync.people' });
+  queue.enqueue('sync.history', {}, { dedupeKey: 'schedule:sync.history', runAt: Date.now() + 5_000 });
   audit(d, { actor: owner.username, action: 'setup.tautulli', after: { url: parsed.data.url, version: info.version } });
   return NextResponse.json({ ok: true, version: info.version });
 });
