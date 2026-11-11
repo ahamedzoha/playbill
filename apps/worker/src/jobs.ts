@@ -2,7 +2,8 @@ import { join } from 'node:path';
 import { eq, isNull } from 'drizzle-orm';
 import { type Campaign, advanceRun, campaignSettings } from '@playbill/core/campaigns';
 import { isDryRun, mailer } from '@playbill/core/mail';
-import { renderArrivalsEmail, renderDigestEmail } from '@playbill/emails';
+import { renderArrivalsEmail, renderDigestEmail, renderLifecycleEmail } from '@playbill/emails';
+import { evaluateLifecycle, executeRemoval, queueLifecycleEmails, type LifecycleContent } from '@playbill/core/lifecycle';
 import { arrivalsSettings, dueArrivals, ensureArrivalsCampaign, planArrivals, reconcileArrivals, type ArrivalsContent } from '@playbill/core/arrivals';
 import { config, logger } from '@playbill/core';
 import { pruneSessions } from '@playbill/core/auth';
@@ -111,7 +112,12 @@ export const handlers: Record<string, Handler> = {
 // Newsletters
 
 function renderContext(db: Db, campaign: Campaign) {
-  const s = campaign.kind === 'digest' ? campaignSettings(campaign) : { ...arrivalsSettings.parse(campaign.settings), subject: '', intro: '' };
+  const s =
+    campaign.kind === 'digest'
+      ? campaignSettings(campaign)
+      : campaign.kind === 'arrivals'
+        ? { ...arrivalsSettings.parse(campaign.settings), subject: '', intro: '' }
+        : { signature: String((campaign.settings as { signature?: string }).signature ?? 'Plex'), subject: '', intro: '' };
   const general = getSetting(db, 'general');
   const publicUrl = general?.publicUrl ?? (isDryRun() ? 'http://localhost:3000' : null);
   return {
@@ -147,7 +153,9 @@ handlers['campaign.run'] = async (payload, { db, queue, job }) => {
     render: (content, r, id, items, c) =>
       c.kind === 'arrivals'
         ? renderArrivalsEmail(content as unknown as ArrivalsContent, ctx, r, id, items)
-        : renderDigestEmail(content, ctx, r, id),
+        : c.kind === 'lifecycle'
+          ? renderLifecycleEmail(content as unknown as LifecycleContent, ctx, r, id)
+          : renderDigestEmail(content, ctx, r, id),
     pauseMs: 600,
     keepGoing: () => queue.extend(job),
   });
@@ -180,4 +188,26 @@ handlers['arrivals.check'] = async (_payload, { db, queue }) => {
     log.info('arrivals run planned', { ...plan });
     queue.enqueue('campaign.run', { runId: plan.runId }, { dedupeKey: `run:${plan.runId}` });
   }
+};
+
+/** Nightly: cancel what's moot, queue nudges and warnings (when switched on), propose removals. */
+handlers['lifecycle.evaluate'] = async (_payload, { db, queue }) => {
+  const r = evaluateLifecycle(db);
+  const runIds = queueLifecycleEmails(db);
+  for (const id of runIds) queue.enqueue('campaign.run', { runId: id }, { dedupeKey: `run:${id}` });
+  log.info('lifecycle evaluated', { nudges: r.nudges.length, warnings: r.warnings.length, removals: r.removals.length, cancelled: r.cancelled, emails: runIds.length });
+};
+
+/** Sends any account notice that was queued from the UI (a nudge from the person page). */
+handlers['lifecycle.send'] = async (_payload, { db, queue }) => {
+  for (const id of queueLifecycleEmails(db)) queue.enqueue('campaign.run', { runId: id }, { dedupeKey: `run:${id}` });
+};
+
+/** Carries out an approved removal on plex.tv, then refreshes people. */
+handlers['lifecycle.remove'] = async (payload, { db, queue }) => {
+  await executeRemoval(db, String(payload.actionId));
+  for (const run of db.select().from(runs).where(eq(runs.windowKey, `life:${String(payload.actionId)}:goodbye`)).all()) {
+    queue.enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
+  }
+  queue.enqueue('sync.people', {}, { dedupeKey: 'schedule:sync.people', runAt: Date.now() + 30_000 });
 };

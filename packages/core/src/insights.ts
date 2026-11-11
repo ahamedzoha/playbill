@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm';
 import type { Db } from './db';
-import { libraries, people, plexShares, syncState, watchHistory } from './db/schema';
+import { libraries, lifecycleActions, people, plexShares, syncState, watchHistory } from './db/schema';
 import { type Segment, segmentOf } from './people/segments';
 
 export const DAY = 86_400_000;
@@ -337,6 +337,15 @@ export function overview(db: Db, now: number, rangeDays: number, tz: string): Ov
       decision: true,
     });
   }
+  const awaiting = db.select({ n: sql<number>`count(*)` }).from(lifecycleActions).where(eq(lifecycleActions.status, 'awaiting')).get()?.n ?? 0;
+  if (awaiting)
+    housekeeping.push({
+      id: 'approvals',
+      text: `${plural(awaiting, 'removal is', 'removals are')} waiting for your approval.`,
+      count: awaiting,
+      action: { label: 'Decide', href: '/people#approvals' },
+      decision: true,
+    });
   if (inactive.length)
     housekeeping.push({
       id: 'inactive',

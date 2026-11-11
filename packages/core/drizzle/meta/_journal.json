@@ -29,6 +29,13 @@
       "when": 1794382668133,
       "tag": "0003_arrivals",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794383047032,
+      "tag": "0004_lifecycle",
+      "breakpoints": true
     }
   ]
 }

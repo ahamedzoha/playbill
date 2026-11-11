@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState, useTransition } from 'react';
-import { type FormState, addIntegration, removeIntegration, saveEmail, saveGeneral, sendTestEmail } from '@/app/settings/actions';
+import { type FormState, addIntegration, removeIntegration, saveEmail, saveGeneral, saveLifecycle, sendTestEmail } from '@/app/settings/actions';
 
 const input = 'w-full rounded-lg border border-rule bg-paper/40 px-3 py-2 text-sm focus:border-blue focus:outline-none';
 const primary = 'rounded-lg bg-rail px-4 py-2 text-sm font-medium text-rail-ink transition-colors hover:bg-rail-active disabled:opacity-60';
@@ -193,6 +193,46 @@ export function AddIntegrationForm() {
       <div className="flex items-center gap-3">
         <button className={primary} disabled={pending}>
           {pending ? 'Connecting…' : 'Test and add'}
+        </button>
+        <Note state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function LifecycleForm({ v }: { v: { enabled: boolean; nudgeDays: number; warnDays: number; removeDays: number; graceDays: number; sendGoodbye: boolean } }) {
+  const [state, action, pending] = useActionState<FormState | null, FormData>(saveLifecycle, null);
+  const num = `${input} num`;
+  return (
+    <form action={action} className="space-y-5">
+      <label className="flex items-start gap-3">
+        <input type="checkbox" name="enabled" defaultChecked={v.enabled} className="mt-1 size-4 accent-[var(--blue)]" />
+        <span className="text-sm">
+          <span className="font-medium">Look after inactive people automatically</span>
+          <span className="block text-ink-3">Each morning, Playbill sends nudges and warnings on its own. Removing anyone always waits for your approval. People marked exempt, Plex Home members and you are never touched.</span>
+        </span>
+      </label>
+      <div className="grid gap-4 sm:grid-cols-4">
+        <Field label="Nudge after" help="days without watching">
+          <input name="nudgeDays" type="number" min={14} defaultValue={v.nudgeDays} className={num} />
+        </Field>
+        <Field label="Warn after" help="days without watching">
+          <input name="warnDays" type="number" min={30} defaultValue={v.warnDays} className={num} />
+        </Field>
+        <Field label="Propose removal after" help="days without watching">
+          <input name="removeDays" type="number" min={60} defaultValue={v.removeDays} className={num} />
+        </Field>
+        <Field label="Grace after warning" help="days to play anything">
+          <input name="graceDays" type="number" min={3} defaultValue={v.graceDays} className={num} />
+        </Field>
+      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="sendGoodbye" defaultChecked={v.sendGoodbye} className="size-4 accent-[var(--blue)]" />
+        Send a short goodbye when you remove someone
+      </label>
+      <div className="flex items-center gap-3">
+        <button className={primary} disabled={pending}>
+          {pending ? 'Saving…' : 'Save'}
         </button>
         <Note state={state} />
       </div>

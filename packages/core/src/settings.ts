@@ -51,6 +51,16 @@ export const settingSchemas = {
     /** Playbill's own sending limits; leave room for other apps on the same account. */
     limits: z.object({ perDay: z.number().int().min(1), perMonth: z.number().int().min(1) }),
   }),
+  /** Inactive-user housekeeping. Nudges and warnings send automatically when enabled; removals always wait for approval. */
+  lifecycle: z.object({
+    enabled: z.boolean(),
+    nudgeDays: z.number().int().min(14),
+    warnDays: z.number().int().min(30),
+    removeDays: z.number().int().min(60),
+    /** Days between the warning and when removal is proposed. */
+    graceDays: z.number().int().min(3),
+    sendGoodbye: z.boolean(),
+  }),
 } as const;
 
 export type SettingKey = keyof typeof settingSchemas;

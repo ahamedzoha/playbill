@@ -113,3 +113,30 @@ export async function renderArrivalsEmail(content: ArrivalsContent, ctx: Arrival
     idempotencyKey: deliveryId,
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Account notices (nudge, warning, goodbye)
+
+import type { LifecycleContent } from '@playbill/core/lifecycle';
+import { LifecycleEmail, lifecycleSubject } from './lifecycle';
+
+export { LifecycleEmail, lifecycleSubject };
+
+export async function renderLifecycleEmail(content: LifecycleContent, ctx: { publicUrl: string; signature: string; tz: string }, r: Recipient, deliveryId: string): Promise<OutgoingEmail> {
+  const token = preferenceToken(r.plexUserId ?? 'test');
+  const el = createElement(LifecycleEmail, {
+    content,
+    recipientName: r.name,
+    signature: ctx.signature,
+    tz: ctx.tz,
+    image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), plex: 'https://app.plex.tv/desktop' },
+  });
+  const [html, text] = await Promise.all([render(el), render(el, { plainText: true })]);
+  // Warnings and goodbyes are about their access, so they carry no unsubscribe header; nudges do.
+  const headers: Record<string, string> =
+    content.type === 'nudge'
+      ? { 'List-Unsubscribe': `<${joinUrl(ctx.publicUrl, `/api/unsubscribe/${token}?topic=account`)}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : {};
+  return { to: r.email, toName: r.name, subject: lifecycleSubject(content, ctx.tz), html, text, headers, idempotencyKey: deliveryId };
+}

@@ -288,3 +288,74 @@ export async function getPendingInvites(clientId: string, token: string): Promis
     })),
   }));
 }
+
+// ---------------------------------------------------------------------------------------------
+// Sharing (write side). Same endpoints python-plexapi uses (inviteFriend, updateFriend,
+// removeFriend, cancelInvite). Unofficial: every call is wrapped, audited by the caller, and
+// verified by re-reading plex.tv afterwards.
+
+async function plexWrite(method: string, url: string, clientId: string, token: string, body?: unknown): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method,
+      headers: { ...plexHeaders(clientId, token), ...(body ? { 'Content-Type': 'application/json' } : {}), Accept: 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (err) {
+    throw new HttpError(`Could not reach plex.tv: ${err instanceof Error ? err.message : String(err)}`, null, url);
+  }
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new HttpError(`plex.tv said ${res.status} ${res.statusText}${text ? `: ${text.slice(0, 200)}` : ''}`, res.status, url);
+  }
+}
+
+/**
+ * plex.tv identifies libraries by its own section ids, while the server and Tautulli use section keys.
+ * Returns key → plex.tv id for our server.
+ */
+export async function sectionIdMap(clientId: string, token: string, machineId: string): Promise<Map<string, number>> {
+  const doc = await requestXml(`https://plex.tv/api/servers/${machineId}`, clientId, token);
+  const server = list<Record<string, unknown>>((doc.MediaContainer as Record<string, unknown> | undefined)?.Server)[0];
+  const sections = list<Record<string, string>>(server?.Section);
+  return new Map(sections.map((s) => [String(s.key), Number(s.id)]));
+}
+
+async function toSectionIds(clientId: string, token: string, machineId: string, sectionKeys: string[]): Promise<number[]> {
+  const map = await sectionIdMap(clientId, token, machineId);
+  const ids = sectionKeys.map((k) => map.get(k));
+  if (ids.some((i) => i === undefined)) throw new Error('A library no longer exists on the server; refresh and try again.');
+  return ids as number[];
+}
+
+/** Shares the chosen libraries with a Plex account (by email or username). They must accept the invite. */
+export async function inviteFriend(clientId: string, token: string, machineId: string, invitee: string, sectionKeys: string[], allowSync = false): Promise<void> {
+  const ids = await toSectionIds(clientId, token, machineId, sectionKeys);
+  await plexWrite('POST', `https://plex.tv/api/servers/${machineId}/shared_servers`, clientId, token, {
+    server_id: machineId,
+    shared_server: { library_section_ids: ids, invited_email: invitee },
+    sharing_settings: { allowSync: allowSync ? '1' : '0', allowCameraUpload: '0', allowChannels: '0', filterMovies: '', filterTelevision: '', filterMusic: '' },
+  });
+}
+
+/** Changes which libraries an existing share includes. */
+export async function updateShareLibraries(clientId: string, token: string, machineId: string, shareId: string, sectionKeys: string[]): Promise<void> {
+  if (sectionKeys.length === 0) throw new Error('Choose at least one library, or remove access instead.');
+  const ids = await toSectionIds(clientId, token, machineId, sectionKeys);
+  await plexWrite('PUT', `https://plex.tv/api/servers/${machineId}/shared_servers/${shareId}`, clientId, token, {
+    server_id: machineId,
+    shared_server: { library_section_ids: ids },
+  });
+}
+
+/** Ends the friendship and every share with this account. Not undoable: a re-invite must be accepted again. */
+export async function removeFriend(clientId: string, token: string, userId: string): Promise<void> {
+  await plexWrite('DELETE', `https://plex.tv/api/v2/sharings/${encodeURIComponent(userId)}`, clientId, token);
+}
+
+/** Withdraws an invite that hasn't been accepted yet. */
+export async function cancelInvite(clientId: string, token: string, inviteId: string): Promise<void> {
+  await plexWrite('DELETE', `https://plex.tv/api/invites/requested/${encodeURIComponent(inviteId)}?friend=0&home=0&server=1`, clientId, token);
+}

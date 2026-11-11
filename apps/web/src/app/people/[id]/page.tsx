@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 import { personDetail, weeklyMarks } from '@playbill/core/insights';
 import { Avatar } from '@/components/avatar';
 import { PersonForm } from '@/components/person-form';
+import { LibraryPicker, PersonActions } from '@/components/access-controls';
+import { personActions } from '@playbill/core/lifecycle';
+import { libraries, plexShares } from '@playbill/core/db/schema';
+import { eq } from 'drizzle-orm';
 import { RegisterKey, RegisterStrip } from '@/components/register-strip';
 import { monthYear, withJoin } from '@/lib/register';
 import { Shell } from '@/components/shell';
@@ -30,6 +34,13 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
   if (!detail) notFound();
   const { person: p } = detail;
   const joined = detail.acceptedAt ?? detail.invitedAt;
+  const actions = personActions(d, id);
+  const allLibraries = d.select().from(libraries).all().filter((l) => l.active).map((l) => ({ key: l.sectionId, name: l.name }));
+  const share = d.select().from(plexShares).where(eq(plexShares.plexUserId, id)).get();
+  const removal = actions.find((a) => a.kind === 'removal' && a.status === 'done');
+  const canReinvite = p.status === 'removed' && !!removal && ((removal.snapshot as { sectionIds?: string[] } | null)?.sectionIds?.length ?? 0) > 0;
+  const ACTION_LABEL: Record<string, string> = { nudge: 'Nudge', warning: 'Warning', removal: 'Removal', reinvite: 'Re-invite', libraries: 'Libraries changed' };
+  const STATUS_LABEL: Record<string, string> = { queued: 'queued', sent: 'sent', awaiting: 'waiting for your approval', approved: 'approved', done: 'done', cancelled: 'cancelled', failed: 'failed' };
   const year = withJoin(weeklyMarks(d, [id], now, 52).get(id) ?? [], joined);
   const quarters = [0, 13, 26, 39].map((i) => year.slice(i, i + 13));
   const weeksWatched = year.filter((c) => c.level > 0).length;
@@ -163,7 +174,39 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
               <Fact label="Seen by Plex" value={detail.plexLastSeenAt ? daysAgo(detail.plexLastSeenAt, now) : '—'} />
               <Fact label="All time" value={`${plural(p.plays, 'play', 'plays')} · ${hours(p.hours)}`} />
             </dl>
+            {share?.shareId && !share.allLibraries && allLibraries.length > 0 && (
+              <div className="mt-4 border-t border-rule pt-4">
+                <p className="mb-2 text-sm font-medium">Libraries they can see</p>
+                <LibraryPicker id={p.id} libraries={allLibraries} selected={share.sectionIds} />
+              </div>
+            )}
+            {p.segment !== 'owner' && (
+              <div className="mt-4 border-t border-rule pt-4">
+                <PersonActions id={p.id} name={p.displayName} status={p.status} canNudge={!!p.email && (p.status === 'shared' || p.status === 'home')} canReinvite={canReinvite} />
+              </div>
+            )}
           </section>
+
+          {actions.length > 0 && (
+            <section aria-labelledby="history" className="rounded-xl border border-rule bg-sheet p-5">
+              <h2 id="history" className="mb-3 text-lg font-semibold tracking-[-0.01em]">
+                Housekeeping history
+              </h2>
+              <ol className="divide-y divide-rule text-sm">
+                {actions.map((a) => (
+                  <li key={a.id} className="py-2">
+                    <span className="flex items-baseline justify-between gap-3">
+                      <span className={a.status === 'awaiting' || a.status === 'failed' ? 'font-medium text-red' : 'font-medium'}>
+                        {ACTION_LABEL[a.kind]} · {STATUS_LABEL[a.status]}
+                      </span>
+                      <span className="num shrink-0 text-ink-3">{longDate(a.createdAt, tz)}</span>
+                    </span>
+                    <span className="block text-ink-3">{a.error ?? a.reason}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           {detail.topTitles.length > 0 && (
             <section aria-labelledby="top" className="rounded-xl border border-rule bg-sheet p-5">

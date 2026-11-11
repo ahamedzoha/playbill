@@ -67,6 +67,38 @@ Still to do in P0:
 
 Still to do in P1: demo mode, so contributors and screenshots don't need a real server.
 
+## P2 Weekly digest, P3 New arrivals, P4 People management (built)
+
+- **Digest:**
+  - Thursdays at 7 pm by default.
+  - Sections: recently added, coming up, filled requests, totals.
+  - Test mode and Go live need confirmation; previews show it as any person.
+  - Quota guard; one-click unsubscribe; web view; signed image proxy.
+- **Arrivals:**
+  - A reconciler runs every 15 minutes; the first sync is backlog.
+  - Batches wait 2 h (max 24 h) and skip quiet hours.
+  - Episodes go to followers, films to everyone who wants them; requesters are skipped; at most
+    one a day per person; arrivals are dropped when the allowance is short.
+- **People management:**
+  - Nightly rules (off by default): nudge at 60 days, warn at 165 with a 14-day deadline, propose
+    removal at 180.
+  - Approvals panel on People and Overview.
+  - Person page: change libraries, nudge, remove (confirmed), re-invite from the saved share,
+    withdraw an invite.
+  - Every plex.tv write is audited.
+- **plex.tv write endpoints** (from python-plexapi, unofficial):
+  - Invite: `POST /api/servers/{machine}/shared_servers`, which takes plex.tv section ids.
+    `GET /api/servers/{machine}` maps keys to ids.
+  - Change libraries: `PUT /api/servers/{machine}/shared_servers/{shareId}`.
+  - Remove: `DELETE /api/v2/sharings/{userId}`.
+  - Cancel an invite: `DELETE /api/invites/requested/{id}?friend=0&home=0&server=1`.
+- **Headless config:**
+  `echo '{…}' | docker exec -i playbill node /app/worker/dist/worker.mjs config <general|email|integration>`.
+
+Still to verify live:
+- Real email to the owner's own inbox: digest and arrivals tests, plus a mail-tester score.
+- The plex.tv write calls, against a test Plex account the owner provides.
+
 ## Notes and gotchas
 
 - Turbopack treats `new URL('…', import.meta.url)` as an asset import, so migration paths live in
@@ -79,3 +111,9 @@ Still to do in P1: demo mode, so contributors and screenshots don't need a real 
   uses `next/script` with `strategy="beforeInteractive"` instead.
 - Plex invites (`/api/invites/requested`) often list the server by name only, with no machine
   id.
+- React Email templates need `/** @jsxRuntime automatic */` at the top. Without it the worker,
+  run under tsx or esbuild, compiles JSX the classic way and fails with "React is not defined".
+- A `'use server'` file may export only async functions; exporting a constant from one crashes at
+  runtime.
+- Arrivals record their baseline in `sync_state`, not by checking whether the table is empty, so
+  an empty first answer from Tautulli doesn't turn the next sync into backlog.

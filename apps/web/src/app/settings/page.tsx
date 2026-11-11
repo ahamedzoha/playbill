@@ -5,7 +5,8 @@ import { listIntegrations } from '@playbill/core/integrations';
 import { isDryRun } from '@playbill/core/mail';
 import { DEFAULT_LIMITS } from '@playbill/core/quota';
 import { getSetting } from '@playbill/core/settings';
-import { AddIntegrationForm, EmailForm, GeneralForm, IntegrationList } from '@/components/settings-forms';
+import { AddIntegrationForm, EmailForm, GeneralForm, IntegrationList, LifecycleForm } from '@/components/settings-forms';
+import { lifecycleRules } from '@playbill/core/lifecycle';
 import { Shell } from '@/components/shell';
 import { daysAgo } from '@/lib/format';
 import { appInfo, db, requireAdmin, serverName, timezone } from '@/lib/server';
@@ -73,6 +74,12 @@ export default async function SettingsPage() {
                 hasSecret: !!email?.secretEnc,
               }}
             />
+          </div>
+        </Section>
+
+        <Section id="housekeeping" title="Housekeeping" intro="Nudge people who drift away, warn before access ends, and propose removing long-inactive shares for you to approve.">
+          <div className="border-t border-rule px-5 py-5 sm:px-6">
+            <LifecycleForm v={lifecycleRules(d)} />
           </div>
         </Section>
 

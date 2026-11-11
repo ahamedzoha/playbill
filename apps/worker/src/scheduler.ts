@@ -25,6 +25,8 @@ const BUILT_IN: BuiltIn[] = [
   { name: 'sync.people', cron: '7 */6 * * *', job: 'sync.people', needsSetup: true },
   { name: 'sync.history', cron: '*/15 * * * *', job: 'sync.history', needsSetup: true },
   { name: 'arrivals.check', cron: '5,20,35,50 * * * *', job: 'arrivals.check', needsSetup: true },
+  // After the morning history sync, so last night's plays count before anyone is nudged or warned.
+  { name: 'lifecycle.evaluate', cron: '40 10 * * *', job: 'lifecycle.evaluate', needsSetup: true },
 ];
 
 export const TICK_MS = 30_000;

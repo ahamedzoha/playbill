@@ -228,7 +228,7 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
     const pending = db.select({ n: sql<number>`count(*)` }).from(deliveries).where(and(eq(deliveries.runId, run.id), eq(deliveries.status, 'pending'))).get()?.n ?? 0;
     const quota = quotaState(db, t);
     if (pending > quota.remaining) {
-      if (!isDigest) {
+      if (campaign.kind === 'arrivals') {
         // Alerts are only early news: when the allowance is short, drop them; the weekly digest covers them.
         db.update(deliveries)
           .set({ status: 'skipped', error: 'Over the sending allowance; the weekly digest will include it' })

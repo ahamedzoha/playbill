@@ -163,3 +163,20 @@ export async function removeIntegration(id: string): Promise<FormState> {
   });
 }
 
+
+export async function saveLifecycle(_p: FormState | null, form: FormData): Promise<FormState> {
+  return wrap(async () => {
+    const o = await owner();
+    const n = (k: string) => Number(form.get(k));
+    const v = { enabled: form.get('enabled') === 'on', nudgeDays: n('nudgeDays'), warnDays: n('warnDays'), removeDays: n('removeDays'), graceDays: n('graceDays'), sendGoodbye: form.get('sendGoodbye') === 'on' };
+    if (![v.nudgeDays, v.warnDays, v.removeDays, v.graceDays].every((x) => Number.isInteger(x) && x > 0)) return fail('Use whole numbers of days.');
+    if (!(v.nudgeDays < v.warnDays && v.warnDays < v.removeDays)) return fail('The nudge must come before the warning, and the warning before removal.');
+    if (v.removeDays - v.warnDays < v.graceDays) return fail('Leave at least the grace period between the warning and removal.');
+    const d = db();
+    const before = getSetting(d, 'lifecycle');
+    setSetting(d, 'lifecycle', v);
+    audit(d, { actor: o.username, action: 'settings.lifecycle', before, after: v });
+    revalidatePath('/settings');
+    return { ok: true, message: v.enabled ? 'Saved. Housekeeping runs each morning.' : 'Saved. Housekeeping is off.' };
+  });
+}

@@ -284,7 +284,7 @@ export const suppressions = sqliteTable('suppressions', {
 
 export const campaigns = sqliteTable('campaigns', {
   id: text('id').primaryKey(),
-  kind: text('kind', { enum: ['digest', 'arrivals'] }).notNull(),
+  kind: text('kind', { enum: ['digest', 'arrivals', 'lifecycle'] }).notNull(),
   name: text('name').notNull(),
   topic: text('topic').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
@@ -387,4 +387,35 @@ export const arrivals = sqliteTable(
     alertRunId: text('alert_run_id'),
   },
   (t) => [index('arrivals_pending_idx').on(t.alertRunId), index('arrivals_group_idx').on(t.groupKey)],
+);
+
+/**
+ * Housekeeping actions on people: automatic nudges and warnings, and removals that wait for the
+ * owner's approval. `snapshot` keeps the share as it was, so a removal can be undone by re-inviting.
+ */
+export const lifecycleActions = sqliteTable(
+  'lifecycle_actions',
+  {
+    id: text('id').primaryKey(),
+    plexUserId: text('plex_user_id').notNull(),
+    kind: text('kind', { enum: ['nudge', 'warning', 'removal', 'reinvite', 'libraries'] }).notNull(),
+    /**
+     * queued → sent (emails) | awaiting (removal, needs approval) → approved → done.
+     * cancelled when they watched again or the owner kept them; failed with `error`.
+     */
+    status: text('status', { enum: ['queued', 'sent', 'awaiting', 'approved', 'done', 'cancelled', 'failed'] }).notNull(),
+    reason: text('reason').notNull(),
+    /** For warnings: the date access ends unless they watch. */
+    deadline: integer('deadline'),
+    /** The person's last play when the action was created; a later play cancels it. */
+    lastPlayedAt: integer('last_played_at'),
+    runId: text('run_id'),
+    snapshot: text('snapshot', { mode: 'json' }).$type<Record<string, unknown>>(),
+    decidedBy: text('decided_by'),
+    decidedAt: integer('decided_at'),
+    error: text('error'),
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (t) => [index('lifecycle_person_idx').on(t.plexUserId, t.kind), index('lifecycle_status_idx').on(t.status)],
 );
