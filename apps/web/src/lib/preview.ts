@@ -84,5 +84,5 @@ export function withPreviewStrip(html: string, subject: string, note: string | n
 }
 
 export function emptyPreview(message: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#0c0c0e;color:#d9d4c9;font-family:system-ui,sans-serif"><p style="max-width:440px;margin:80px auto;padding:0 24px;font-size:15px;line-height:23px;text-align:center">${esc(message)}</p></body></html>`;
+  return `<!doctype html><html><body style="margin:0;background:#0c0c0e;color:#d9d4c9;font-family:system-ui,sans-serif;"><p style="max-width:440px;margin:80px auto;padding:0 24px;font-size:15px;line-height:23px;text-align:center">${esc(message)}</p></body></html>`;
 }
