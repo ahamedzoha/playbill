@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, sql } from 'drizzle-orm';
 import type { Db } from './db';
-import { libraries, lifecycleActions, people, plexShares, syncState, watchHistory } from './db/schema';
+import { leaving, libraries, lifecycleActions, people, plexShares, syncState, watchHistory } from './db/schema';
 import { type Segment, segmentOf } from './people/segments';
 
 export const DAY = 86_400_000;
@@ -337,6 +337,19 @@ export function overview(db: Db, now: number, rangeDays: number, tz: string): Ov
       decision: true,
     });
   }
+  const removeToday = db
+    .select({ n: sql<number>`count(*)` })
+    .from(leaving)
+    .where(and(inArray(leaving.status, ['planned', 'notified']), sql`${leaving.removeAt} <= ${now}`))
+    .get()?.n ?? 0;
+  if (removeToday)
+    housekeeping.push({
+      id: 'leaving',
+      text: `${plural(removeToday, 'title is', 'titles are')} due to be removed. Delete ${removeToday === 1 ? 'it' : 'them'} in Radarr or Sonarr, then mark ${removeToday === 1 ? 'it' : 'them'} done.`,
+      count: removeToday,
+      action: { label: 'See titles', href: '/library' },
+      decision: true,
+    });
   const awaiting = db.select({ n: sql<number>`count(*)` }).from(lifecycleActions).where(eq(lifecycleActions.status, 'awaiting')).get()?.n ?? 0;
   if (awaiting)
     housekeeping.push({

@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutList, Mail, Settings, Users } from 'lucide-react';
+import { Library, LayoutList, Mail, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -8,10 +8,10 @@ const ITEMS = [
   { href: '/', label: 'Overview', icon: LayoutList },
   { href: '/people', label: 'People', icon: Users },
   { href: '/newsletters', label: 'Newsletters', icon: Mail },
+  { href: '/library', label: 'Library', icon: Library },
   { href: '/settings', label: 'Settings', icon: Settings },
 ] as const;
 
-/** Library arrives in a later version; it appears here when it exists, not before. */
 function isActive(pathname: string, href: string): boolean {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -48,7 +48,7 @@ export function TabBar() {
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-sheet/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         {ITEMS.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (

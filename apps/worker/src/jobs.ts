@@ -2,7 +2,8 @@ import { join } from 'node:path';
 import { eq, isNull } from 'drizzle-orm';
 import { type Campaign, advanceRun, campaignSettings } from '@playbill/core/campaigns';
 import { isDryRun, mailer } from '@playbill/core/mail';
-import { renderArrivalsEmail, renderDigestEmail, renderLifecycleEmail, renderRecapEmail } from '@playbill/emails';
+import { renderArrivalsEmail, renderDigestEmail, renderLeavingEmail, renderLifecycleEmail, renderRecapEmail } from '@playbill/emails';
+import { planLeavingNotices, syncLibrary, type LeavingContent } from '@playbill/core/library';
 import type { RecapContent } from '@playbill/core/recap';
 import { evaluateLifecycle, executeRemoval, queueLifecycleEmails, type LifecycleContent } from '@playbill/core/lifecycle';
 import { arrivalsSettings, dueArrivals, ensureArrivalsCampaign, planArrivals, reconcileArrivals, type ArrivalsContent } from '@playbill/core/arrivals';
@@ -158,7 +159,9 @@ handlers['campaign.run'] = async (payload, { db, queue, job }) => {
           ? renderLifecycleEmail(content as unknown as LifecycleContent, ctx, r, id)
           : c.kind === 'recap'
             ? renderRecapEmail(content as unknown as RecapContent, ctx, r, id)
-            : renderDigestEmail(content, ctx, r, id),
+            : c.kind === 'leaving'
+              ? renderLeavingEmail(content as unknown as LeavingContent, ctx, r, id, items)
+              : renderDigestEmail(content, ctx, r, id),
     pauseMs: 600,
     keepGoing: () => queue.extend(job),
   });
@@ -213,4 +216,17 @@ handlers['lifecycle.remove'] = async (payload, { db, queue }) => {
     queue.enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
   }
   queue.enqueue('sync.people', {}, { dedupeKey: 'schedule:sync.people', runAt: Date.now() + 30_000 });
+};
+
+/** Daily: refresh the library list with play counts and sizes. */
+handlers['sync.library'] = async (_payload, { db }) => {
+  const client = tautulli(db);
+  if (!client) return;
+  log.info('library synced', { titles: await syncLibrary(db, client) });
+};
+
+/** Daily: send leaving-soon notices for titles whose notice window has opened. */
+handlers['leaving.check'] = async (_payload, { db, queue }) => {
+  const runId = planLeavingNotices(db);
+  if (runId) queue.enqueue('campaign.run', { runId }, { dedupeKey: `run:${runId}` });
 };

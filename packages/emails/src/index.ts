@@ -174,3 +174,36 @@ export async function renderRecapEmail(content: RecapContent, ctx: { publicUrl: 
     idempotencyKey: deliveryId,
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Leaving soon
+
+import type { LeavingContent } from '@playbill/core/library';
+import { LeavingEmail, leavingSubject } from './leaving';
+
+export { LeavingEmail, leavingSubject };
+
+export async function renderLeavingEmail(content: LeavingContent, ctx: { publicUrl: string; serverName: string; signature: string; tz: string }, r: Recipient, deliveryId: string, itemKeys: string[] | null): Promise<OutgoingEmail> {
+  const items = itemKeys ? content.items.filter((i) => itemKeys.includes(i.key)) : content.items;
+  if (items.length === 0) throw new Error('No items for this person');
+  const token = preferenceToken(r.plexUserId ?? 'test');
+  const el = createElement(LeavingEmail, {
+    items,
+    recipientName: r.name,
+    serverName: ctx.serverName,
+    signature: ctx.signature,
+    tz: ctx.tz,
+    image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=leaving`), plex: 'https://app.plex.tv/desktop' },
+  });
+  const [html, text] = await Promise.all([render(el), render(el, { plainText: true })]);
+  return {
+    to: r.email,
+    toName: r.name,
+    subject: leavingSubject(items),
+    html,
+    text,
+    headers: { 'List-Unsubscribe': `<${joinUrl(ctx.publicUrl, `/api/unsubscribe/${token}?topic=leaving`)}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+    idempotencyKey: deliveryId,
+  };
+}

@@ -284,7 +284,7 @@ export const suppressions = sqliteTable('suppressions', {
 
 export const campaigns = sqliteTable('campaigns', {
   id: text('id').primaryKey(),
-  kind: text('kind', { enum: ['digest', 'arrivals', 'lifecycle', 'recap'] }).notNull(),
+  kind: text('kind', { enum: ['digest', 'arrivals', 'lifecycle', 'recap', 'leaving'] }).notNull(),
   name: text('name').notNull(),
   topic: text('topic').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
@@ -418,4 +418,45 @@ export const lifecycleActions = sqliteTable(
     updatedAt: integer('updated_at').notNull(),
   },
   (t) => [index('lifecycle_person_idx').on(t.plexUserId, t.kind), index('lifecycle_status_idx').on(t.status)],
+);
+
+/** Every film and show in the libraries with its play count, refreshed daily from Tautulli. */
+export const libraryItems = sqliteTable(
+  'library_items',
+  {
+    ratingKey: text('rating_key').primaryKey(),
+    sectionId: text('section_id').notNull(),
+    kind: text('kind').notNull(),
+    title: text('title').notNull(),
+    year: integer('year'),
+    thumb: text('thumb'),
+    addedAt: integer('added_at'),
+    lastPlayedAt: integer('last_played_at'),
+    plays: integer('plays').notNull().default(0),
+    bytes: integer('bytes'),
+    syncedAt: integer('synced_at').notNull(),
+  },
+  (t) => [index('library_items_last_idx').on(t.lastPlayedAt)],
+);
+
+/**
+ * Titles the owner plans to remove. Playbill tells the people who watched them a few days ahead
+ * and reminds the owner on the day; it never deletes anything itself.
+ */
+export const leaving = sqliteTable(
+  'leaving',
+  {
+    ratingKey: text('rating_key').primaryKey(),
+    title: text('title').notNull(),
+    kind: text('kind').notNull(),
+    image: text('image', { mode: 'json' }).$type<Record<string, unknown>>(),
+    removeAt: integer('remove_at').notNull(),
+    noticeDays: integer('notice_days').notNull(),
+    status: text('status', { enum: ['planned', 'notified', 'removed', 'cancelled'] }).notNull(),
+    runId: text('run_id'),
+    createdBy: text('created_by').notNull(),
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (t) => [index('leaving_status_idx').on(t.status, t.removeAt)],
 );

@@ -95,6 +95,16 @@ Still to do in P1: demo mode, so contributors and screenshots don't need a real 
 - **Headless config:**
   `echo '{…}' | docker exec -i playbill node /app/worker/dist/worker.mjs config <general|email|integration>`.
 
+- **Monthly recap (P5):** sent on the 1st at 10 am, personal numbers only, off and in test mode
+  by default.
+- **Library and Leaving soon (P6):**
+  - Daily library sync from Tautulli, listing never-watched titles and titles not watched in a
+    year, with sizes.
+  - Plan a removal date; people who watched a title get one notice N days before, and the owner
+    gets a reminder on the day. Playbill never deletes files.
+  - Not built yet: "Removed" notices from Sonarr/Radarr delete webhooks, and per-library filters
+    (for example, to hide a Courses library).
+
 Still to verify live:
 - Real email to the owner's own inbox: digest and arrivals tests, plus a mail-tester score.
 - The plex.tv write calls, against a test Plex account the owner provides.
