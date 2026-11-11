@@ -192,7 +192,7 @@ export function groupArrivals(rows: (typeof arrivals.$inferSelect)[], followed: 
 }
 
 /** Who watched which shows recently: show key → people. */
-function followers(db: Db, keys: string[], since: number): Map<string, Set<string>> {
+export function followers(db: Db, keys: string[], since: number): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   if (keys.length === 0) return out;
   const rows = db

@@ -77,9 +77,14 @@ export function PersonActions({
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
         {canNudge && (
-          <button type="button" className={quiet} disabled={pending} onClick={() => run(() => nudgePerson(id))}>
-            Send a nudge
-          </button>
+          <>
+            <button type="button" className={quiet} disabled={pending} onClick={() => run(() => nudgePerson(id))}>
+              Send a nudge
+            </button>
+            <a href={`/newsletters?preview=nudge&for=${encodeURIComponent(id)}#preview`} className="self-center px-1 text-sm text-blue hover:underline">
+              Preview it
+            </a>
+          </>
         )}
         {status === 'pending' && id.startsWith('invite:') && (
           <button type="button" className={quiet} disabled={pending} onClick={() => run(() => withdrawPersonInvite(id))}>

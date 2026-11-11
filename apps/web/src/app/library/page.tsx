@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { leavingList, removalCandidates } from '@playbill/core/library';
 import { CandidateTable, LeavingRow } from '@/components/library-controls';
 import { Shell } from '@/components/shell';
@@ -46,9 +47,14 @@ export default async function LibraryPage() {
 
       {planned.length > 0 && (
         <section aria-labelledby="leaving" className="mt-8 rounded-xl border border-rule bg-sheet">
-          <h2 id="leaving" className="px-5 pt-5 pb-4 text-lg font-semibold tracking-[-0.01em] sm:px-6">
-            Leaving soon
-          </h2>
+          <div className="flex items-baseline justify-between gap-4 px-5 pt-5 pb-4 sm:px-6">
+            <h2 id="leaving" className="text-lg font-semibold tracking-[-0.01em]">
+              Leaving soon
+            </h2>
+            <Link href="/newsletters?preview=leaving#preview" className="shrink-0 text-sm text-blue hover:underline">
+              Preview the email
+            </Link>
+          </div>
           <ul className="divide-y divide-rule border-t border-rule-strong">
             {planned.map((p) => (
               <li key={p.ratingKey} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 sm:px-6">

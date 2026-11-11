@@ -17,6 +17,12 @@ export interface OutgoingEmail {
   idempotencyKey: string;
 }
 
+/**
+ * A unique X-Entity-Ref-ID stops Gmail threading every weekly digest (same subject, same sender)
+ * into one conversation, where it hides the parts that repeat behind "•••".
+ */
+const withEntityRef = (email: OutgoingEmail): Record<string, string> => ({ 'X-Entity-Ref-ID': email.idempotencyKey, ...email.headers });
+
 /** The provider refused because a sending limit was reached: stop for now, try again later. */
 export class QuotaExceededError extends Error {
   constructor(message: string) {
@@ -65,7 +71,7 @@ export function resendProvider(cfg: SettingValue<'email'>, apiKey: string): Mail
           html: email.html,
           text: email.text,
           reply_to: cfg.replyTo ?? undefined,
-          headers: email.headers,
+          headers: withEntityRef(email),
         }),
         signal: AbortSignal.timeout(20_000),
       });
@@ -101,7 +107,7 @@ export function smtpProvider(cfg: SettingValue<'email'>, password: string): Mail
           subject: email.subject,
           html: email.html,
           text: email.text,
-          headers: email.headers,
+          headers: withEntityRef(email),
           messageId: `<${email.idempotencyKey}@playbill>`,
         });
         return { id: info.messageId };

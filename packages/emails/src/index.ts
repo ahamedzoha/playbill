@@ -12,8 +12,14 @@ import { DigestEmail, digestPreheader } from './digest';
  */
 const MSO_OPEN = '<!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->';
 const MSO_CLOSE = '<!--[if mso]></td></tr></table><![endif]-->';
-async function renderHtml(el: Parameters<typeof render>[0]): Promise<string> {
-  return (await render(el)).replace('<div data-pb-mso="open"></div>', MSO_OPEN).replace('<div data-pb-mso="close"></div>', MSO_CLOSE);
+const INK = '#0c0c0e';
+async function renderHtml(el: Parameters<typeof render>[0], uid: string): Promise<string> {
+  // Invisible and unique per email: Gmail trims an ending it has seen before in the same thread.
+  const tag = `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${INK}">${uid.replace(/[^\w-]/g, '')} ${Date.now().toString(36)}</div>`;
+  return (await render(el))
+    .replace('<div data-pb-mso="open"></div>', MSO_OPEN)
+    .replace('<div data-pb-mso="close"></div>', MSO_CLOSE)
+    .replace('<div data-pb-uid=""></div>', tag);
 }
 
 export { DigestEmail, digestPreheader };
@@ -56,7 +62,7 @@ export async function renderDigestHtml(content: DigestContent, ctx: DigestRender
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
     links,
   });
-  const [html, text] = await Promise.all([renderHtml(el), render(el, { plainText: true })]);
+  const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return { html, text, links };
 }
 
@@ -109,7 +115,7 @@ export async function renderArrivalsEmail(content: ArrivalsContent, ctx: Arrival
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
     links,
   });
-  const [html, text] = await Promise.all([renderHtml(el), render(el, { plainText: true })]);
+  const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return {
     to: r.email,
     toName: r.name,
@@ -142,7 +148,7 @@ export async function renderLifecycleEmail(content: LifecycleContent, ctx: { pub
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
     links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), plex: 'https://app.plex.tv/desktop' },
   });
-  const [html, text] = await Promise.all([renderHtml(el), render(el, { plainText: true })]);
+  const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   // Warnings and goodbyes are about their access, so they carry no unsubscribe header; nudges do.
   const headers: Record<string, string> =
     content.type === 'nudge'
@@ -174,7 +180,7 @@ export async function renderRecapEmail(content: RecapContent, ctx: { publicUrl: 
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
     links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=recap`), plex: 'https://app.plex.tv/desktop' },
   });
-  const [html, text] = await Promise.all([renderHtml(el), render(el, { plainText: true })]);
+  const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return {
     to: r.email,
     toName: r.name,
@@ -207,7 +213,7 @@ export async function renderLeavingEmail(content: LeavingContent, ctx: { publicU
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
     links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=leaving`), plex: 'https://app.plex.tv/desktop' },
   });
-  const [html, text] = await Promise.all([renderHtml(el), render(el, { plainText: true })]);
+  const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return {
     to: r.email,
     toName: r.name,

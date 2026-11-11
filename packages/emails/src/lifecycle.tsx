@@ -36,7 +36,7 @@ export function LifecycleEmail(p: LifecycleEmailProps) {
   const items = c.type === 'goodbye' ? [] : c.items;
   return (
     <Shell preview={c.type === 'nudge' ? 'A few things you might have missed.' : c.type === 'warning' ? 'Play anything before then to keep it.' : 'Thanks for watching with us.'}>
-      <Section style={{ height: '34px' }} />
+      <Section style={{ height: '34px', backgroundColor: C.ink }} />
       <Pad>
         <SheetTitle>{title}</SheetTitle>
         <Billing
@@ -82,7 +82,7 @@ export function LifecycleEmail(p: LifecycleEmailProps) {
         <Signoff greeting={c.type === 'goodbye' ? 'All the best,' : 'See you there,'} signature={p.signature} />
       </Pad>
       {c.type === 'nudge' ? (
-        <Section style={{ padding: '0 22px 36px' }}>
+        <Section style={{ padding: '0 22px 36px', backgroundColor: C.ink }}>
           <Text style={{ margin: '44px 0 0', padding: '18px 0 0', borderTop: `1px solid ${C.rule}`, fontSize: '12px', lineHeight: '19px', textAlign: 'center' }}>
             <a href={p.links.preferences} style={{ color: C.link, textDecoration: 'underline' }}>
               Choose what you get
@@ -90,7 +90,7 @@ export function LifecycleEmail(p: LifecycleEmailProps) {
           </Text>
         </Section>
       ) : (
-        <Section style={{ height: '36px' }} />
+        <Section style={{ height: '36px', backgroundColor: C.ink }} />
       )}
     </Shell>
   );

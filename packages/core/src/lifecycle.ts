@@ -190,6 +190,17 @@ function lastTitle(db: Db, p: Person): string | null {
 }
 
 /**
+ * What a nudge, warning or goodbye to this person says, as of `now`. Shared by real sends and the
+ * admin preview so the two can't drift apart. A warning without a deadline gets the grace period.
+ */
+export function lifecycleContentFor(db: Db, p: Person, kind: 'nudge' | 'warning' | 'goodbye', serverName: string, now = Date.now(), deadline?: number): LifecycleContent {
+  if (kind === 'goodbye') return { type: 'goodbye', serverName };
+  const since = idleSince(p) ?? now - 90 * DAY;
+  if (kind === 'nudge') return { type: 'nudge', serverName, lastTitle: lastTitle(db, p), lastPlayedAt: p.lastPlayedAt, items: newSince(db, p, since) };
+  return { type: 'warning', serverName, deadline: deadline ?? now + lifecycleRules(db).graceDays * DAY, lastPlayedAt: p.lastPlayedAt, items: newSince(db, p, since).slice(0, 3) };
+}
+
+/**
  * Turns queued nudge/warning actions (and goodbyes) into one-delivery runs on the account-notices
  * campaign, so they share the quota guard, idempotency and history with every other email.
  * People who opted out of account notices still get warnings: losing access is something they must hear about.
@@ -205,11 +216,7 @@ export function queueLifecycleEmails(db: Db, now = Date.now()): string[] {
       db.update(lifecycleActions).set({ status: 'cancelled', reason: 'No way to email them', updatedAt: now }).where(eq(lifecycleActions.id, a.id)).run();
       continue;
     }
-    const since = idleSince(p) ?? now - 90 * DAY;
-    const content: LifecycleContent =
-      a.kind === 'nudge'
-        ? { type: 'nudge', serverName: server, lastTitle: lastTitle(db, p), lastPlayedAt: p.lastPlayedAt, items: newSince(db, p, since) }
-        : { type: 'warning', serverName: server, deadline: a.deadline ?? now + 14 * DAY, lastPlayedAt: p.lastPlayedAt, items: newSince(db, p, since).slice(0, 3) };
+    const content = lifecycleContentFor(db, p, a.kind as 'nudge' | 'warning', server, now, a.deadline ?? undefined);
     runIds.push(oneOff(db, c.id, `life:${a.id}`, content, p));
     db.update(lifecycleActions).set({ status: 'sent', updatedAt: now }).where(eq(lifecycleActions.id, a.id)).run();
   }

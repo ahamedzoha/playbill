@@ -1,30 +1,24 @@
-import { eq } from 'drizzle-orm';
-import { campaignSettings, ensureDigestCampaign } from '@playbill/core/campaigns';
-import { people } from '@playbill/core/db/schema';
-import { buildDigest } from '@playbill/core/digest';
-import { radarrs, seerr, sonarrs, tautulli } from '@playbill/core/integrations';
-import { renderForRecipient } from '@/lib/digest';
-import { currentOwner, db } from '@/lib/server';
+import { isPreviewKind } from '@playbill/core/preview';
+import { emptyPreview, renderPreview, withPreviewStrip } from '@/lib/preview';
+import { currentOwner } from '@/lib/server';
 
 export const dynamic = 'force-dynamic';
 
-/** This week's digest as one person would get it, built live (nothing is saved or sent). */
+/**
+ * Any email as one person would get it, built live (nothing is saved or sent).
+ * `?email=digest|arrivals|recap|leaving|nudge|warning|goodbye&for=<plexUserId>`; digest by default.
+ */
 export async function GET(req: Request) {
   if (!(await currentOwner())) return new Response('Sign in first', { status: 401 });
-  const d = db();
-  const c = ensureDigestCampaign(d);
-  const s = campaignSettings(c);
   const url = new URL(req.url);
-  const person = url.searchParams.get('for');
-  const p = person ? d.select().from(people).where(eq(people.plexUserId, person)).get() : null;
-  const now = Date.now();
-  const content = await buildDigest(d, { tautulli: tautulli(d), seerr: seerr(d), sonarrs: sonarrs(d), radarrs: radarrs(d) }, s, now - 7 * 86_400_000, now);
-  const { html } = await renderForRecipient(
-    content,
-    c,
-    { plexUserId: p?.plexUserId ?? null, email: p?.email ?? 'preview@example.com', name: p?.displayName ?? 'there' },
-    'preview',
-    url.origin,
-  );
+  const email = url.searchParams.get('email');
+  const kind = isPreviewKind(email) ? email : 'digest';
+  let html: string;
+  try {
+    const out = await renderPreview(kind, url.searchParams.get('for'), url.origin);
+    html = 'empty' in out ? emptyPreview(out.empty) : withPreviewStrip(out.html, out.subject, out.note);
+  } catch (err) {
+    html = emptyPreview(`This preview couldn't be built: ${err instanceof Error ? err.message : String(err)}`);
+  }
   return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }

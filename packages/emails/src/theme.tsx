@@ -72,7 +72,11 @@ export function Shell({ preview, children }: { preview: string; children: ReactN
               <td align="center" style={{ padding: 0 }}>
                 {/* Outlook ignores max-width; index.ts swaps these markers for a 600px conditional table. */}
                 <div data-pb-mso="open" />
-                <Container style={{ width: '100%', maxWidth: '600px', margin: '0 auto', backgroundColor: C.ink }}>{children}</Container>
+                <Container style={{ width: '100%', maxWidth: '600px', margin: '0 auto', backgroundColor: C.ink }}>
+                  {children}
+                  {/* index.ts fills this with a hidden id unique to each email, so Gmail never sees two emails end the same way and trims the ending. */}
+                  <div data-pb-uid="" />
+                </Container>
                 <div data-pb-mso="close" />
               </td>
             </tr>
@@ -85,13 +89,14 @@ export function Shell({ preview, children }: { preview: string; children: ReactN
 
 /** Side padding for everything below the poster. */
 export function Pad({ children, style }: { children: ReactNode; style?: CSSProperties }) {
-  return <Section style={{ padding: '0 22px', ...style }}>{children}</Section>;
+  // Every section carries the ink itself: Gmail can lift trailing sections out of the outer frame.
+  return <Section style={{ padding: '0 22px', backgroundColor: C.ink, ...style }}>{children}</Section>;
 }
 
 /** The lead poster: full width on a phone, a 440px one-sheet centred on a desktop, fading into the ink. */
 export function LeadPoster({ src, alt }: { src: string; alt: string }) {
   return (
-    <Section style={{ textAlign: 'center' }}>
+    <Section style={{ textAlign: 'center', backgroundColor: C.ink }}>
       <Img src={src} width={440} height={550} alt={alt} style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '440px', height: 'auto', backgroundColor: C.well, border: 0 }} />
     </Section>
   );
@@ -144,7 +149,7 @@ export function DateLine({ children }: { children: string }) {
   // One line on a phone wherever possible: a 28px line holds about 20 condensed caps in 346px.
   const size = children.length <= 20 ? 28 : children.length <= 26 ? 23 : 20;
   return (
-    <Section style={{ padding: '0 22px', marginTop: '22px' }}>
+    <Section style={{ padding: '0 22px', marginTop: '22px', backgroundColor: C.ink }}>
       <Text
         style={{
           margin: 0,
@@ -231,7 +236,7 @@ export function Signoff({ greeting, signature }: { greeting: string; signature: 
 export function Footer({ reason, links }: { reason: string; links: { label: string; href: string }[] }) {
   const a = { color: C.link, textDecoration: 'underline' };
   return (
-    <Section style={{ padding: '0 22px 36px' }}>
+    <Section style={{ padding: '0 22px 36px', backgroundColor: C.ink }}>
       <Text style={{ margin: '44px 0 0', padding: '18px 0 0', borderTop: `1px solid ${C.rule}`, fontSize: '12px', lineHeight: '19px', color: C.bill, textAlign: 'center' }}>
         {reason}{' '}
         {links.map((l, i) => (

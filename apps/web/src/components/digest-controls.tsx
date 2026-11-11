@@ -203,37 +203,3 @@ export function DigestForm({ values }: { values: DigestFormValues }) {
     </form>
   );
 }
-
-export function DigestPreview({ people }: { people: { id: string; name: string }[] }) {
-  const [who, setWho] = useState(people[0]?.id ?? '');
-  const [key, setKey] = useState(0);
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-ink-2">Preview as</span>
-          <select value={who} onChange={(e) => setWho(e.target.value)} className="rounded-lg border border-rule bg-sheet px-2 py-1.5 text-sm">
-            {people.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="button" onClick={() => setKey((k) => k + 1)} className="text-sm text-blue hover:underline">
-          Refresh
-        </button>
-        <a href={`/newsletters/preview?for=${encodeURIComponent(who)}`} target="_blank" rel="noreferrer" className="text-sm text-blue hover:underline">
-          Open in a new tab
-        </a>
-      </div>
-      <iframe
-        key={`${who}:${key}`}
-        title="Digest preview"
-        src={`/newsletters/preview?for=${encodeURIComponent(who)}`}
-        className="h-[52rem] w-full rounded-xl border border-rule bg-[#f3f5f9]"
-        sandbox=""
-      />
-    </div>
-  );
-}

@@ -6,7 +6,9 @@ import { isDryRun } from '@playbill/core/mail';
 import { quotaState } from '@playbill/core/quota';
 import { nextOccurrence } from '@playbill/core/schedule';
 import { getSetting } from '@playbill/core/settings';
-import { DigestControls, DigestForm, DigestPreview } from '@/components/digest-controls';
+import { DigestControls, DigestForm } from '@/components/digest-controls';
+import { EmailPreview } from '@/components/email-preview';
+import { isPreviewKind } from '@playbill/core/preview-kinds';
 import { ArrivalsControls } from '@/components/arrivals-controls';
 import { RecapControls } from '@/components/recap-controls';
 import { ensureRecapCampaign } from '@playbill/core/recap';
@@ -32,13 +34,24 @@ const STATUS: Record<string, string> = {
   skipped: 'Skipped',
 };
 
+/** Opens the preview panel on this email (the panel sits beside the forms on wide screens, below them on phones). */
+function PreviewLink({ kind }: { kind: string }) {
+  return (
+    <Link href={`/newsletters?preview=${kind}#preview`} className="shrink-0 text-sm text-blue hover:underline">
+      Preview
+    </Link>
+  );
+}
+
 function timeLabel(h: number, m: number): string {
   const hh = h % 12 === 0 ? 12 : h % 12;
   return `${hh}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'am' : 'pm'}`;
 }
 
-export default async function NewslettersPage() {
+export default async function NewslettersPage({ searchParams }: { searchParams: Promise<{ preview?: string; for?: string }> }) {
   const admin = await requireAdmin();
+  const sp = await searchParams;
+  const previewKind = isPreviewKind(sp.preview) ? sp.preview : 'digest';
   const d = db();
   const tz = timezone();
   const c = ensureDigestCampaign(d);
@@ -139,16 +152,22 @@ export default async function NewslettersPage() {
           </section>
 
           <section className="rounded-xl border border-rule bg-sheet p-5 sm:p-6">
-            <h2 className="mb-5 text-lg font-semibold tracking-[-0.01em]">What it says</h2>
+            <div className="mb-5 flex items-baseline justify-between gap-4">
+              <h2 className="text-lg font-semibold tracking-[-0.01em]">What it says</h2>
+              <PreviewLink kind="digest" />
+            </div>
             <DigestForm
               values={{ ...s, day, time: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}` }}
             />
           </section>
 
           <section aria-labelledby="arrivals" className="rounded-xl border border-rule bg-sheet p-5 sm:p-6">
-            <h2 id="arrivals" className="text-lg font-semibold tracking-[-0.01em]">
-              New arrivals
-            </h2>
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id="arrivals" className="text-lg font-semibold tracking-[-0.01em]">
+                New arrivals
+              </h2>
+              <PreviewLink kind="arrivals" />
+            </div>
             <p className="mt-1 mb-5 max-w-[70ch] text-sm text-ink-2">
               A short "it's here" email: new episodes go to people who watch that show, new films and series to everyone who wants them (people who watched in the last month, unless they choose otherwise). Whoever requested a title is skipped, since Seerr already told them. At most one a day per person.{' '}
               <span className="num">{pendingArrivalsCount(d)}</span> waiting{arrivalRuns[0] ? `, last batch ${dateTime(arrivalRuns[0].createdAt, tz)}` : ''}.
@@ -161,9 +180,12 @@ export default async function NewslettersPage() {
           </section>
 
           <section aria-labelledby="recap" className="rounded-xl border border-rule bg-sheet p-5 sm:p-6">
-            <h2 id="recap" className="text-lg font-semibold tracking-[-0.01em]">
-              Monthly recap
-            </h2>
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id="recap" className="text-lg font-semibold tracking-[-0.01em]">
+                Monthly recap
+              </h2>
+              <PreviewLink kind="recap" />
+            </div>
             <p className="mt-1 mb-5 max-w-[70ch] text-sm text-ink-2">
               On the 1st at 10 am, each person who watched something gets their own month: hours, the evenings they watched most, their top titles and anything they didn't finish. Only they see their numbers.
             </p>
@@ -192,7 +214,7 @@ export default async function NewslettersPage() {
                       <tr key={r.id} className="border-b border-rule last:border-b-0">
                         <td className="num py-2.5 pr-3 pl-5 text-ink-2 sm:pl-6">{dateTime(r.createdAt, tz)}</td>
                         <td className="py-2.5 pr-3">
-                          {({ arrivals: 'Arrivals', recap: 'Recap', lifecycle: 'Account notice', digest: 'Digest' } as Record<string, string>)[kindOf.get(r.campaignId) ?? 'digest']}
+                          {({ arrivals: 'Arrivals', recap: 'Recap', lifecycle: 'Account notice', leaving: 'Leaving soon', digest: 'Digest' } as Record<string, string>)[kindOf.get(r.campaignId) ?? 'digest']}
                           <span className="block text-xs text-ink-3">{r.trigger === 'test' ? 'Test' : r.trigger === 'manual' ? 'Sent by hand' : 'Scheduled'}</span>
                         </td>
                         <td className="py-2.5 pr-3">
@@ -214,11 +236,11 @@ export default async function NewslettersPage() {
           </section>
         </div>
 
-        <section aria-labelledby="preview" className="min-w-0 rounded-xl border border-rule bg-sheet p-5">
+        <section aria-labelledby="preview" className="min-w-0 scroll-mt-6 rounded-xl border border-rule bg-sheet p-5 xl:sticky xl:top-6">
           <h2 id="preview" className="mb-3 text-lg font-semibold tracking-[-0.01em]">
-            This week's email
+            Preview
           </h2>
-          <DigestPreview people={previewPeople} />
+          <EmailPreview key={`${previewKind}:${sp.for ?? ''}`} people={previewPeople} initialKind={previewKind} initialPerson={sp.for} />
         </section>
       </div>
     </Shell>

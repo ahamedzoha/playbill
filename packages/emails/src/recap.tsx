@@ -3,7 +3,7 @@
 import { Section } from '@react-email/components';
 import type { PersonRecap } from '@playbill/core/recap';
 import type { ImageRef } from '@playbill/core/links';
-import { Billing, DateLine, Dot, Fact, Footer, GoldButton, Greeting, Note, Pad, PosterRow, SheetHeading, SheetTitle, Shell, Signoff } from './theme';
+import { Billing, C, DateLine, Dot, Fact, Footer, GoldButton, Greeting, Note, Pad, PosterRow, SheetHeading, SheetTitle, Shell, Signoff } from './theme';
 
 const DAYS = ['Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays', 'Sundays'];
 
@@ -38,7 +38,7 @@ export function RecapEmail(p: RecapEmailProps) {
   const vs = change(r.hours, r.previousHours);
   return (
     <Shell preview={`${hoursText(r.hours)} across ${r.activeDays} ${r.activeDays === 1 ? 'day' : 'days'}${r.top[0] ? `, mostly ${r.top[0].title}` : ''}.`}>
-      <Section style={{ height: '34px' }} />
+      <Section style={{ height: '34px', backgroundColor: C.ink }} />
       <Pad>
         <SheetTitle>{`Your ${month}`}</SheetTitle>
         <Billing
