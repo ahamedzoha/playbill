@@ -31,9 +31,11 @@ Done:
   `/config` → healthy, setup code logged), then publishes multi-arch images (`edge` from main,
   semver and `latest` from tags).
 
+- Published: public repo, `ghcr.io/ahamedzoha/playbill` (anonymous pull works).
+- Optional auto-update timer in `deploy/auto-update/`. On the maintainer's server, a push to
+  `main` was live about 9 minutes later, verified 2026-11-11 (`a0da3bb` → `3b6693b`).
+
 Still to do in P0:
-- [ ] Publish the repo and the first image.
-- [ ] Homelab install (CT 101 compose project, update timer, NPM host, backup pull).
 - [ ] Demo mode (`DEMO_MODE=1` with fixture data).
 - [ ] Local break-glass password; trusted-header auth.
 
