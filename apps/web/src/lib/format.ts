@@ -11,22 +11,27 @@ export function daysAgo(ts: number | null, now: number): string {
   return `${Math.round(d / 365)} years ago`;
 }
 
+/** en-GB writes September as "Sept"; the rest of the UI uses three letters. */
+const sep = (s: string) => s.replace('Sept', 'Sep');
+
 export function shortDate(ts: number, tz: string): string {
-  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: tz }).format(ts);
+  return sep(new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: tz }).format(ts));
 }
 
 export function longDate(ts: number, tz: string): string {
-  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: tz }).format(ts);
+  return sep(new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: tz }).format(ts));
 }
 
 export function dateTime(ts: number, tz: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: tz,
-  }).format(ts);
+  return sep(
+    new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: tz,
+    }).format(ts),
+  );
 }
 
 export function hours(h: number): string {

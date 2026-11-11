@@ -29,6 +29,7 @@ export function RegisterStrip({
   label,
   animateKey,
   className = '',
+  fluid = false,
 }: {
   cells: StripCell[];
   tz: string;
@@ -38,10 +39,13 @@ export function RegisterStrip({
   /** Changing this replays the ink-in animation (used when the range changes). */
   animateKey?: string;
   className?: string;
+  /** Fill the parent's width: marks shrink to fit (never above their size), so the strip can't overflow. */
+  fluid?: boolean;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const marks = useRef<(HTMLSpanElement | null)[]>([]);
   const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: tz });
+  const fmtDay = (t: number) => fmt.format(t).replace('Sept', 'Sep');
   const cell = active === null ? null : cells[active];
   const el = active === null ? null : marks.current[active];
   const left = el ? el.offsetLeft + el.offsetWidth / 2 : 0;
@@ -63,7 +67,7 @@ export function RegisterStrip({
 
   return (
     <div
-      className={`relative inline-block rounded-[4px] ${className}`}
+      className={`relative rounded-[4px] ${fluid ? 'block w-full' : 'inline-block'} ${className}`}
       style={{ ['--mark-fallback' as string]: `${size}px` }}
       tabIndex={0}
       role="group"
@@ -82,8 +86,7 @@ export function RegisterStrip({
             }}
             className="mark-ink block"
             style={{
-              width: SIZE,
-              height: SIZE,
+              ...(fluid ? { flex: '1 1 0', minWidth: 0, maxWidth: SIZE, aspectRatio: '1' } : { width: SIZE, height: SIZE }),
               borderRadius: `calc(${SIZE} * 0.24)`,
               background: c.before ? 'transparent' : FILL[c.level],
               boxShadow: c.before ? 'inset 0 0 0 1px var(--slot-line)' : undefined,
@@ -107,7 +110,7 @@ export function RegisterStrip({
         {cell && (
           <>
             <p className="caps text-ink-3">
-              {fmt.format(cell.start)} – {fmt.format(cell.end - 1)}
+              {fmtDay(cell.start)} – {fmtDay(cell.end - 1)}
             </p>
             {cell.before ? (
               <p className="mt-1 text-ink-2">Before they joined</p>

@@ -101,6 +101,7 @@ export function WeeklyBars({ weeks, tz }: { weeks: WeekBar[]; tz: string }) {
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...weeks.map((w) => w.hours));
   const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: tz });
+  const fmtDay = (t: number) => fmt.format(t).replace('Sept', 'Sep');
   const cur = hover === null ? null : weeks[hover];
   const nice = Math.ceil(max / 10) * 10;
 
@@ -116,7 +117,7 @@ export function WeeklyBars({ weeks, tz }: { weeks: WeekBar[]; tz: string }) {
               onMouseEnter={() => setHover(i)}
               onFocus={() => setHover(i)}
               onBlur={() => setHover(null)}
-              aria-label={`${fmt.format(w.start)}: ${w.hours} hours, ${w.plays} plays, ${w.people} people`}
+              aria-label={`${fmtDay(w.start)}: ${w.hours} hours, ${w.plays} plays, ${w.people} people`}
             >
               <span
                 className={`block w-full rounded-t-[4px] transition-colors ${hover === i ? 'bg-mark-4' : 'bg-mark-2'}`}
@@ -126,7 +127,7 @@ export function WeeklyBars({ weeks, tz }: { weeks: WeekBar[]; tz: string }) {
           ))}
         </div>
         <div className="mt-1.5 flex justify-between text-[0.6875rem] text-ink-3">
-          <span className="num">{weeks[0] ? fmt.format(weeks[0].start) : ''}</span>
+          <span className="num">{weeks[0] ? fmtDay(weeks[0].start) : ''}</span>
           <span>This week</span>
         </div>
         <span className="num absolute top-0 left-0 -translate-y-full pb-1 text-[0.6875rem] text-ink-3">{nice} h</span>
@@ -137,7 +138,7 @@ export function WeeklyBars({ weeks, tz }: { weeks: WeekBar[]; tz: string }) {
             style={{ left: `${((hover! + 0.5) / weeks.length) * 100}%` }}
           >
             <p className="caps text-ink-3">
-              {fmt.format(cur.start)} – {fmt.format(cur.end - 1)}
+              {fmtDay(cur.start)} – {fmtDay(cur.end - 1)}
             </p>
             <p className="num mt-1 font-medium">{cur.hours} hours</p>
             <p className="num text-ink-2">
@@ -155,6 +156,7 @@ export function ActiveHistory({ weeks, total, tz }: { weeks: { start: number; en
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...weeks.map((w) => w.count));
   const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: tz });
+  const fmtDay = (t: number) => fmt.format(t).replace('Sept', 'Sep');
   const cur = hover === null ? null : weeks[hover];
   return (
     <div className="relative" onMouseLeave={() => setHover(null)}>
@@ -174,7 +176,7 @@ export function ActiveHistory({ weeks, total, tz }: { weeks: { start: number; en
           className="pointer-events-none absolute bottom-full z-30 mb-2 w-max -translate-x-1/2 rounded-lg border border-rule bg-sheet px-3 py-1.5 text-sm shadow-sheet"
           style={{ left: hover! * 13 + 5 }}
         >
-          <span className="num font-medium">{cur.count}</span> watched · {fmt.format(cur.start)} – {fmt.format(cur.end - 1)}
+          <span className="num font-medium">{cur.count}</span> watched · {fmtDay(cur.start)} – {fmtDay(cur.end - 1)}
         </div>
       )}
     </div>

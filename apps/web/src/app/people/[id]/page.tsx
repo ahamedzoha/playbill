@@ -76,13 +76,13 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
               </h2>
               <RegisterKey showBefore={year.some((c) => c.before)} />
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+            <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 2xl:grid-cols-4">
               {quarters.map((q, i) => (
                 <div key={i}>
                   <p className="caps mb-2 text-ink-3">
                     {q[0] ? monthYear(q[0].start, tz) : ''}
                   </p>
-                  <RegisterStrip cells={q} tz={tz} size={16} className="[--mark:15px] sm:[--mark:16px]" label={`Watched in ${q.filter((c) => c.level > 0).length} of these 13 weeks`} />
+                  <RegisterStrip fluid cells={q} tz={tz} size={16} className="[--mark:16px]" label={`Watched in ${q.filter((c) => c.level > 0).length} of these 13 weeks`} />
                 </div>
               ))}
             </div>
