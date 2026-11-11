@@ -46,7 +46,7 @@ export function digestLinks(ctx: DigestRenderContext, r: Recipient, deliveryId: 
     preferences: joinUrl(ctx.publicUrl, `/u/${token}`),
     unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=${ctx.topic}`),
     oneClick: joinUrl(ctx.publicUrl, `/api/unsubscribe/${token}?topic=${ctx.topic}`),
-    plex: 'https://app.plex.tv/desktop',
+    plex: joinUrl(ctx.publicUrl, '/go/plex'),
   };
 }
 
@@ -105,7 +105,7 @@ export async function renderArrivalsEmail(content: ArrivalsContent, ctx: Arrival
   const links = {
     preferences: joinUrl(ctx.publicUrl, `/u/${token}`),
     unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=arrivals`),
-    plex: 'https://app.plex.tv/desktop',
+    plex: joinUrl(ctx.publicUrl, '/go/plex'),
   };
   const el = createElement(ArrivalsEmail, {
     items,
@@ -146,7 +146,7 @@ export async function renderLifecycleEmail(content: LifecycleContent, ctx: { pub
     signature: ctx.signature,
     tz: ctx.tz,
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
-    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), plex: 'https://app.plex.tv/desktop' },
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), plex: joinUrl(ctx.publicUrl, '/go/plex') },
   });
   const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   // Warnings and goodbyes are about their access, so they carry no unsubscribe header; nudges do.
@@ -178,7 +178,7 @@ export async function renderRecapEmail(content: RecapContent, ctx: { publicUrl: 
     serverName: ctx.serverName,
     signature: ctx.signature,
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
-    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=recap`), plex: 'https://app.plex.tv/desktop' },
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=recap`), plex: joinUrl(ctx.publicUrl, '/go/plex') },
   });
   const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return {
@@ -211,7 +211,7 @@ export async function renderLeavingEmail(content: LeavingContent, ctx: { publicU
     signature: ctx.signature,
     tz: ctx.tz,
     image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
-    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=leaving`), plex: 'https://app.plex.tv/desktop' },
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=leaving`), plex: joinUrl(ctx.publicUrl, '/go/plex') },
   });
   const [html, text] = await Promise.all([renderHtml(el, deliveryId), render(el, { plainText: true })]);
   return {
