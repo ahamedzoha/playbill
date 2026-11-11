@@ -105,9 +105,9 @@ export default async function NewslettersPage() {
         </p>
       )}
       {dry && (
-        <p className="mt-6 max-w-3xl rounded-xl border border-rule bg-sheet px-5 py-4 text-sm text-ink-2">
-          Email is in dry-run mode on this install: messages are written to the <code className="rounded bg-paper px-1">outbox</code> folder in your config
-          directory and never sent.
+        <p className="mt-6 max-w-3xl rounded-xl border border-red/30 bg-red-wash px-5 py-4 text-sm">
+          <span className="font-medium text-red">Dry run: nothing on this install is emailed.</span> Every message, tests included, is written to the{' '}
+          <code className="rounded bg-sheet px-1">outbox</code> folder in the config directory instead.
         </p>
       )}
 
@@ -117,8 +117,11 @@ export default async function NewslettersPage() {
             <DigestControls enabled={c.enabled} mode={c.mode} audience={audience.recipients.length} emailReady={emailReady} />
             <dl className="mt-6 grid gap-x-6 gap-y-3 border-t border-rule pt-5 text-sm sm:grid-cols-3">
               <div>
-                <dt className="text-ink-3">Would receive it</dt>
-                <dd className="num mt-0.5 text-ink">{audience.recipients.length} people</dd>
+                <dt className="text-ink-3">{c.mode === 'live' ? 'Gets it' : 'Gets it now (test mode)'}</dt>
+                <dd className="num mt-0.5 text-ink">
+                  {c.mode === 'live' ? `${audience.recipients.length} people` : s.testAddresses.length ? s.testAddresses.join(', ') : 'Nobody: add a test address'}
+                </dd>
+                {c.mode === 'test' && <dd className="num mt-0.5 text-xs text-ink-3">{audience.recipients.length} people once it's live</dd>}
               </div>
               <div>
                 <dt className="text-ink-3">Opted out or unreachable</dt>

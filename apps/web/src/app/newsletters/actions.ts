@@ -3,9 +3,10 @@
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { audit } from '@playbill/core/audit';
-import { createRun, digestSettings, ensureDigestCampaign } from '@playbill/core/campaigns';
+import { campaignSettings, createRun, digestSettings, ensureDigestCampaign } from '@playbill/core/campaigns';
 import { campaigns } from '@playbill/core/db/schema';
 import { Queue } from '@playbill/core/queue';
+import { isDryRun } from '@playbill/core/mail';
 import { currentOwner, db } from '@/lib/server';
 
 export interface FormState {
@@ -89,7 +90,9 @@ export async function sendDigestNow(kind: 'test' | 'live'): Promise<FormState> {
     new Queue(d).enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
     audit(d, { actor: o.username, action: `digest.send.${kind}`, target: run.id });
     revalidatePath('/newsletters');
-    return { ok: true, message: kind === 'test' ? 'Test on its way. It usually arrives within a minute.' : 'Sending now.' };
+    const to = campaignSettings(c).testAddresses.join(', ') || 'your test addresses';
+    if (isDryRun()) return { ok: true, message: `Dry run: written to the outbox folder for ${to}. Nothing was emailed.` };
+    return { ok: true, message: kind === 'test' ? `Test sent to ${to} only. It usually arrives within a minute.` : 'Sending now.' };
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
@@ -150,7 +153,8 @@ export async function sendArrivalsTest(): Promise<FormState> {
     new Queue(d).enqueue('campaign.run', { runId: plan.runId }, { dedupeKey: `run:${plan.runId}` });
     audit(d, { actor: o.username, action: 'arrivals.send.test', target: plan.runId });
     revalidatePath('/newsletters');
-    return { ok: true, message: `Test with ${plan.items} ${plan.items === 1 ? 'title' : 'titles'} on its way.` };
+    if (isDryRun()) return { ok: true, message: 'Dry run: written to the outbox folder. Nothing was emailed.' };
+    return { ok: true, message: `Test with ${plan.items} ${plan.items === 1 ? 'title' : 'titles'} sent to your test addresses only.` };
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
@@ -185,7 +189,8 @@ export async function sendRecapTest(): Promise<FormState> {
     new Queue(d).enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
     audit(d, { actor: o.username, action: 'recap.send.test', target: run.id });
     revalidatePath('/newsletters');
-    return { ok: true, message: "Test on its way: last month's recap, yours if you watched, otherwise a sample." };
+    if (isDryRun()) return { ok: true, message: 'Dry run: written to the outbox folder. Nothing was emailed.' };
+    return { ok: true, message: "Test sent to your test addresses only: last month's recap, yours if you watched, otherwise a sample." };
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
