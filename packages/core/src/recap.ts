@@ -3,6 +3,7 @@ import type { Db } from './db';
 import { admins, campaigns, people, watchHistory } from './db/schema';
 import { newId } from './ids';
 import { getSetting } from './settings';
+import type { ImageRef } from './links';
 import { normalEmail, suppression, topicPreferences } from './topics';
 
 export interface PersonRecap {
@@ -11,7 +12,8 @@ export interface PersonRecap {
   plays: number;
   activeDays: number;
   previousHours: number;
-  top: { title: string; hours: number }[];
+  /** `image` is missing on recaps frozen before posters were added. */
+  top: { title: string; hours: number; image?: ImageRef | null }[];
   /** Weekday (0 = Monday) they watched most. */
   favouriteDay: number | null;
   /** Started last month and not finished: a nudge to go back. */
@@ -108,11 +110,15 @@ export function buildRecap(db: Db, now: number, tz: string): RecapContent {
     const seconds = list.reduce((s, r) => s + r.playSeconds, 0);
     if (seconds < 300) continue;
     const titles = new Map<string, number>();
+    const posters = new Map<string, string>();
     const days = new Set<string>();
     const wd = Array<number>(7).fill(0);
     for (const r of list) {
       const t = r.grandparentTitle ?? r.title;
       titles.set(t, (titles.get(t) ?? 0) + r.playSeconds);
+      // The show's poster for episodes, the film's own otherwise.
+      const key = r.grandparentRatingKey ?? r.ratingKey;
+      if (key && !posters.has(t)) posters.set(t, key);
       days.add(dayKey(r.startedAt, tz));
       wd[weekday(r.startedAt, tz)]! += r.playSeconds;
     }
@@ -128,7 +134,10 @@ export function buildRecap(db: Db, now: number, tz: string): RecapContent {
       plays: list.length,
       activeDays: days.size,
       previousHours: Math.round(((prev.get(id) ?? 0) / 3600) * 10) / 10,
-      top: [...titles.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([title, s]) => ({ title, hours: Math.round((s / 3600) * 10) / 10 })),
+      top: [...titles.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([title, s]) => {
+        const key = posters.get(title);
+        return { title, hours: Math.round((s / 3600) * 10) / 10, image: key ? ({ k: 'plex', p: `/library/metadata/${key}/thumb`, w: 240, h: 360 } as const) : null };
+      }),
       favouriteDay: wd[best]! > 0 ? best : null,
       unfinished: [...unfinished.entries()].slice(0, 2).map(([title, percent]) => ({ title, percent })),
     };

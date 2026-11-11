@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T16:00:00Z",
+  "title": "Design System: Playbill Emails",
+  "extensions": {
+    "colorMeta": {
+      "gold": { "role": "primary", "displayName": "Marquee Gold", "canonical": "#e0b04a", "tonalRamp": ["#3a2c0c", "#5c4515", "#80611e", "#a37d2b", "#c49a3d", "#e0b04a", "#ecc979", "#f6e0ab"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0c0c0e", "tonalRamp": ["#0c0c0e", "#141417", "#1c1c20", "#2a2a2e", "#3c3c41", "#55555b", "#77777d", "#a0a0a5"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#f1ede4", "tonalRamp": ["#4a4740", "#6b675d", "#8f8a80", "#b3ada0", "#d9d4c9", "#e6e1d7", "#f1ede4", "#faf8f3"] },
+      "note": { "role": "neutral", "displayName": "Note Paper", "canonical": "#d9d4c9", "tonalRamp": ["#4a4740", "#6b675d", "#8f8a80", "#b3ada0", "#c6c1b6", "#d9d4c9", "#e6e1d7", "#f1ede4"] },
+      "bill": { "role": "neutral", "displayName": "Billing Grey", "canonical": "#8f8a80", "tonalRamp": ["#2a2a2e", "#4a4740", "#625f57", "#77736a", "#8f8a80", "#a39e93", "#b3ada0", "#cdc8bd"] },
+      "link": { "role": "neutral", "displayName": "Link Grey", "canonical": "#b3ada0", "tonalRamp": ["#4a4740", "#6b675d", "#8f8a80", "#a39e93", "#b3ada0", "#c6c1b6", "#d9d4c9", "#ebe7de"] },
+      "rule": { "role": "neutral", "displayName": "Rule", "canonical": "#2a2a2e", "tonalRamp": ["#0c0c0e", "#141417", "#1c1c20", "#232327", "#2a2a2e", "#34343a", "#3f3f45", "#4a4a50"] },
+      "rule-strong": { "role": "neutral", "displayName": "Strong Rule", "canonical": "#4a4740", "tonalRamp": ["#1c1c20", "#2a2a2e", "#37352f", "#4a4740", "#5c5950", "#6e6a60", "#807c71", "#8f8a80"] },
+      "well": { "role": "neutral", "displayName": "Poster Well", "canonical": "#1c1c20", "tonalRamp": ["#0c0c0e", "#121215", "#17171a", "#1c1c20", "#232327", "#2a2a2e", "#323237", "#3a3a40"] }
+    },
+    "typographyMeta": {
+      "sheet-title": { "displayName": "Sheet Title", "purpose": "The lead title in condensed black caps; 56/46/36/30px by title length." },
+      "date-line": { "displayName": "Date Line", "purpose": "The one gold statement under the billing; 28/23/20px by length." },
+      "button": { "displayName": "Button", "purpose": "Open Plex label, ink on gold." },
+      "row-title": { "displayName": "Row Title", "purpose": "Titles in poster rows and grid captions." },
+      "billing": { "displayName": "Billing", "purpose": "Dense centred credits in grey caps; facts in paper." },
+      "section-heading": { "displayName": "Section Heading", "purpose": "Wide-tracked grey caps over a hairline." },
+      "greeting": { "displayName": "Greeting", "purpose": "Hey Ann, in the plain sans." },
+      "body": { "displayName": "Body", "purpose": "The owner's note and sign-off." },
+      "footer": { "displayName": "Footer", "purpose": "Reason line and links." }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [
+      { "name": "column", "value": "600px" },
+      { "name": "lead-poster-max", "value": "440px" },
+      { "name": "feature-poster", "value": "260px" },
+      { "name": "grid-poster", "value": "160px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Gold Button",
+      "kind": "button",
+      "refersTo": "gold-button",
+      "description": "Full-width Open Plex button; one per email.",
+      "html": "<a class=\"ds-gold-button\" href=\"#\">Open Plex</a>",
+      "css": ".ds-gold-button { display: block; box-sizing: border-box; background: #e0b04a; color: #0c0c0e; text-align: center; padding: 16px 12px; font-family: 'HelveticaNeue-CondensedBlack', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 17px; line-height: 20px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; } .ds-gold-button:hover { background: #ecc979; } .ds-gold-button:focus-visible { outline: 2px solid #f1ede4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Lead Title and Billing",
+      "kind": "custom",
+      "refersTo": "sheet-title",
+      "description": "Sheet title with its centred billing block.",
+      "html": "<div class=\"ds-lead\"><p class=\"ds-lead-title\">Dune Messiah</p><p class=\"ds-billing\">Home Server presents · A 2026 film<br>Added 4 Nov – 10 Nov</p></div>",
+      "css": ".ds-lead { background: #0c0c0e; padding: 0 22px 8px; text-align: center; } .ds-lead-title { margin: 26px 0 0; color: #f1ede4; font-family: 'HelveticaNeue-CondensedBlack', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 46px; line-height: 45px; font-weight: 900; letter-spacing: 0.01em; text-transform: uppercase; } .ds-billing { margin: 12px auto 0; max-width: 380px; color: #8f8a80; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 11px; line-height: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Date Line",
+      "kind": "custom",
+      "refersTo": "date-line",
+      "description": "The gold release statement between hairlines.",
+      "html": "<p class=\"ds-date-line\">Now on the server</p>",
+      "css": ".ds-date-line { margin: 22px 22px 0; padding: 16px 0 0; border-top: 1px solid #4a4740; background: #0c0c0e; color: #e0b04a; text-align: center; font-family: 'HelveticaNeue-CondensedBlack', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 28px; line-height: 32px; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "section-heading",
+      "description": "Grey tracked caps over a strong hairline.",
+      "html": "<p class=\"ds-heading\">Coming soon</p>",
+      "css": ".ds-heading { margin: 40px 22px 14px; padding: 9px 0 0; border-top: 1px solid #4a4740; background: #0c0c0e; color: #8f8a80; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Poster Row",
+      "kind": "custom",
+      "refersTo": "poster-row",
+      "description": "48x72 poster, caps title, grey detail, gold right-hand date or status.",
+      "html": "<div class=\"ds-row\"><div class=\"ds-row-poster\"></div><div class=\"ds-row-text\"><p class=\"ds-row-title\">Spring Thaw</p><p class=\"ds-row-detail\">New series</p></div><p class=\"ds-row-right\">12 Nov</p></div>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 16px; padding: 12px 22px; background: #0c0c0e; border-top: 1px solid #2a2a2e; } .ds-row-poster { width: 48px; height: 72px; background: #1c1c20; flex: none; } .ds-row-text { flex: 1; } .ds-row-title { margin: 0; color: #f1ede4; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 15px; line-height: 19px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; } .ds-row-detail { margin: 3px 0 0; color: #8f8a80; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 11px; line-height: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; } .ds-row-right { margin: 0; color: #e0b04a; font-family: 'HelveticaNeue-CondensedBlack', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 14px; line-height: 18px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }"
+    },
+    {
+      "name": "Grid Caption",
+      "kind": "card",
+      "refersTo": "poster-well",
+      "description": "Poster placeholder with caps caption and grey detail; no card chrome.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-grid-poster\"></div><p class=\"ds-grid-title\">Night Shift</p><p class=\"ds-grid-detail\">2026</p></div>",
+      "css": ".ds-grid { width: 160px; background: #0c0c0e; padding: 12px; } .ds-grid-poster { width: 100%; padding-bottom: 150%; background: #1c1c20; } .ds-grid-title { margin: 9px 0 0; color: #f1ede4; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 12.5px; line-height: 16px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; } .ds-grid-detail { margin: 2px 0 0; color: #8f8a80; font-family: 'HelveticaNeue-CondensedBold', 'Helvetica Neue Condensed', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-stretch: condensed; font-size: 11.5px; line-height: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The One-Sheet",
+    "overview": "Each email is printed like a theatrical poster's billing: the week's headline title as a poster, the server's name in the credit block, and everything below as smaller one-sheets. The field is ink-black edge to edge, type is paper-white, credits are billing grey, and a single gold marks the date line, right-hand dates and status, and the button. It refuses the streaming-service hero banner over an even poster grid and the plain light newsletter card.\n\nThe reader is a friend or family member of the owner, on a phone, glancing, and the job is to feel like watching tonight. Density comes from condensed caps in small sizes; warmth comes from the owner's own words in a plain sans. The look is designed dark (color-scheme light dark meta, no light variant).",
+    "keyCharacteristics": [
+      "Ink field, 600px column, no outer card.",
+      "Every title carries a poster; none are text-only.",
+      "Condensed caps for billing, headings, dates and titles; plain sans only for the owner's voice.",
+      "Hairline rules instead of containers; no cards, no rounded corners, no shadows.",
+      "System fonts only, by design: a web font would tell a font host every time an email is opened."
+    ],
+    "rules": [
+      { "name": "The One Gold Rule", "body": "Gold appears only on the date line, right-aligned dates/status, and the button. If it is not a date or the action, it is not gold.", "section": "colors" },
+      { "name": "The Billing Rule", "body": "Caps and tracking belong to credits, headings, dates and titles; sentences the owner would say aloud are sentence-case sans.", "section": "typography" },
+      { "name": "The System Stack Rule", "body": "Name stacks, never a hosted font. Test every type change against plain Arial.", "section": "typography" },
+      { "name": "The No Cards Rule", "body": "Group with a hairline and space, never a box, fill or radius.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do give every title a poster; use the ladder lead, 260px, 160px, 48x72 row.",
+      "Do keep gold to the date line, right-hand dates/status and the button.",
+      "Do group with hairlines and space only.",
+      "Do keep the Outlook markers (data-pb-mso), bgcolor on gold and ink cells, inline styles and tables.",
+      "Do route all images through the signed image proxy (fx: 'lead' for the lead), and keep HTML under 102 KB."
+    ],
+    "donts": [
+      "Don't add a web font, remote CSS or any asset that phones a third party.",
+      "Don't wrap content in cards, rounded containers, fills or shadows.",
+      "Don't use gold for decoration, links or headings.",
+      "Don't reveal who requested what; stats are totals only.",
+      "Don't rely on the dark look surviving every client: Gmail iOS may invert dark emails in dark mode. They stay readable but lose the look, which is an accepted limitation."
+    ]
+  }
+}

@@ -174,7 +174,12 @@ export async function buildDigest(db: Db, src: DigestSources, opts: DigestOption
       content.requests = filled
         .filter((f) => f.availableAt < until && !listed.has(f.title.toLowerCase()))
         .slice(0, opts.maxItems)
-        .map((f) => ({ title: f.title, detail: f.mediaType === 'movie' ? 'Film' : 'Series', library: null, image: remoteImage(f.posterUrl) }));
+        .map((f) => ({
+          title: f.title,
+          detail: f.mediaType === 'movie' ? 'Film' : 'Series',
+          library: null,
+          image: remoteImage(f.posterUrl),
+        }));
     } catch (err) {
       log.warn('requests unavailable', { error: errorMessage(err) });
     }

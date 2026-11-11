@@ -30,8 +30,11 @@ export const readPreferenceToken = (token: string) => unpack('prefs', token);
 export const viewToken = (deliveryId: string) => pack('view', deliveryId);
 export const readViewToken = (token: string) => unpack('view', token);
 
-/** What the image proxy may fetch: a Plex image path, or a remote poster URL. */
-export type ImageRef = { k: 'plex'; p: string; w: number; h: number } | { k: 'url'; u: string };
+/**
+ * What the image proxy may fetch: a Plex image path, or a remote poster URL. `fx: 'lead'` asks for
+ * the email's lead poster: cropped to 4:5 from the top and faded into the email's ink at the edges.
+ */
+export type ImageRef = { k: 'plex'; p: string; w: number; h: number; fx?: 'lead' } | { k: 'url'; u: string; fx?: 'lead' };
 
 export const imageToken = (ref: ImageRef) => pack('img', JSON.stringify(ref));
 export function readImageToken(token: string): ImageRef | null {

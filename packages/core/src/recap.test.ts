@@ -24,15 +24,17 @@ describe('buildRecap', () => {
     const play = (d: number, secs: number, title: string, extra = {}) => ({ id: id++, plexUserId: 'a', startedAt: nov(d), playSeconds: secs, mediaType: 'episode', title: 'x', grandparentTitle: title, ...extra });
     db.insert(watchHistory)
       .values([
-        play(2, 3 * 3600, 'Andor'),
-        play(3, 3600, 'Andor'),
+        play(2, 3 * 3600, 'Andor', { grandparentRatingKey: 's1' }),
+        play(3, 3600, 'Andor', { grandparentRatingKey: 's1' }),
         play(9, 1800, 'Severance'),
         { id: id++, plexUserId: 'a', startedAt: nov(10), playSeconds: 1200, mediaType: 'movie', title: 'Dune', ratingKey: 'm1', percentComplete: 40 },
       ])
       .run();
     const r = buildRecap(db, Date.UTC(2026, 11, 1, 10), 'UTC').people.a!;
     expect(r).toMatchObject({ name: 'Ann Lee', plays: 4, activeDays: 4 });
-    expect(r.top[0]).toEqual({ title: 'Andor', hours: 4 });
+    // Episodes take their show's poster.
+    expect(r.top[0]).toEqual({ title: 'Andor', hours: 4, image: { k: 'plex', p: '/library/metadata/s1/thumb', w: 240, h: 360 } });
+    expect(r.top.find((t) => t.title === 'Severance')?.image).toBeNull();
     expect(r.unfinished).toEqual([{ title: 'Dune', percent: 40 }]);
   });
 });

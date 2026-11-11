@@ -69,6 +69,12 @@ Still to do in P1: demo mode, so contributors and screenshots don't need a real 
 
 ## P2 Weekly digest, P3 New arrivals, P4 People management (built)
 
+- **Email design, "The One-Sheet"** (`packages/emails/DESIGN.md`): every email is printed like a cinema
+  poster's billing on an ink field. The digest leads with the week's newest release as a poster
+  (cropped and faded into the ink by the image proxy), then a two-tier poster grid; every title in
+  every email carries a poster. System fonts only; an Outlook 600px conditional table and a
+  bulletproof button.
+
 - **Digest:**
   - Thursdays at 7 pm by default.
   - Sections: recently added, coming up, filled requests, totals.
