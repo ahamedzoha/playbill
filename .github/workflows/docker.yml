@@ -1,0 +1,82 @@
+name: Docker image
+
+# main  → :edge and :sha-<short>   (what the maintainer's own server tracks)
+# v*    → :<version>, :<major>.<minor>, :latest
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  smoke:
+    # Builds the image for amd64 and checks it boots with an empty /config and reports healthy.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: playbill:smoke
+          build-args: APP_REVISION=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Boot and check /api/health
+        run: |
+          docker run -d --name pb -p 5056:5056 playbill:smoke
+          for i in $(seq 1 30); do
+            if body=$(curl -fsS localhost:5056/api/health 2>/dev/null); then
+              echo "$body"
+              echo "$body" | grep -q '"revision":"${{ github.sha }}"'
+              echo "$body" | grep -q '"status":"ok"'
+              docker logs pb 2>&1 | grep -q 'Setup code:'
+              curl -fsS localhost:5056/setup | grep -q 'setup code'
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs pb
+          exit 1
+
+  publish:
+    needs: smoke
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/playbill
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=raw,value=edge,enable={{is_default_branch}}
+            type=sha,format=short
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.version }}
+            APP_REVISION=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -1,0 +1,19 @@
+{
+  "name": "playbill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Newsletters, new-arrival alerts and user management for Plex server owners",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @playbill/web --filter @playbill/worker dev",
+    "build": "pnpm --filter @playbill/worker build && pnpm --filter @playbill/web build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @playbill/core db:generate"
+  }
+}

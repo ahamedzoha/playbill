@@ -1,0 +1,27 @@
+# Playbill — example Docker Compose file.
+#
+#   docker compose up -d
+#   docker compose logs playbill | grep "Setup code"
+#
+# Then open http://<host>:5056 and follow the setup wizard.
+
+services:
+  playbill:
+    image: ghcr.io/ahamedzoha/playbill:latest
+    container_name: playbill
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC # your timezone, e.g. Europe/London; schedules use it
+    volumes:
+      - ./config:/config # database, secret key, backups — back this folder up
+    ports:
+      - 5056:5056
+    # If Tautulli, Seerr, Sonarr or Radarr run in Compose on the same host, join their network
+    # so Playbill can reach them by container name (e.g. http://tautulli:8181):
+    # networks:
+    #   - media
+# networks:
+#   media:
+#     external: true

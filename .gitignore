@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.next/
+out/
+*.tsbuildinfo
+.env
+.env.local
+/data/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+.impeccable/review/
+.impeccable/config.local.json

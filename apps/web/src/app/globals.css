@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+/*
+ * Placeholder tokens for P0. The real visual system comes from the impeccable design round (P1);
+ * keep components on these tokens so the restyle is a token swap, not a rewrite.
+ */
+@theme {
+  --color-canvas: #faf8f5;
+  --color-surface: #ffffff;
+  --color-ink: #1c1a17;
+  --color-muted: #6b665e;
+  --color-line: #e6e1d8;
+  --color-accent: #b4532a;
+  --color-ok: #2f7d4f;
+  --color-bad: #b42a2a;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #151311;
+    --color-surface: #1e1b18;
+    --color-ink: #f2eee8;
+    --color-muted: #a39d93;
+    --color-line: #34302b;
+    --color-accent: #e07a4c;
+    --color-ok: #5cb27f;
+    --color-bad: #e06a6a;
+  }
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
