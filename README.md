@@ -92,7 +92,7 @@ Almost everything is set in the web UI. Environment variables:
 | Tag | Built from |
 |---|---|
 | `latest`, `X.Y.Z`, `X.Y` | Releases |
-| `edge` | Every commit to `main` |
+| `edge` | Every commit to `main` (amd64 only) |
 | `sha-<short>` | A specific commit, for pinning or rollback |
 
 ## Development

@@ -28,7 +28,7 @@ Done:
 - **Encryption:** AES-GCM for stored secrets; HMAC signing for links.
 - **Docker:** one image, a supervisor that migrates then runs the worker and web, PUID/PGID,
   HEALTHCHECK. CI runs typecheck, test and build; the image workflow runs a smoke test (empty
-  `/config` → healthy, setup code logged), then publishes multi-arch images (`edge` from main,
+  `/config` → healthy, setup code logged), then publishes multi-arch images (`edge` from main, amd64 only;
   semver and `latest` from tags).
 
 - Published: public repo, `ghcr.io/ahamedzoha/playbill` (anonymous pull works).
