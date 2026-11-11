@@ -26,7 +26,7 @@ export default async function SetupPage() {
   return (
     <main className="mx-auto min-h-dvh max-w-xl px-6 py-16">
       <h1 className="text-2xl font-semibold">Set up Playbill</h1>
-      <p className="mt-2 text-muted">Three steps: prove you run this install, sign in with Plex, and connect Tautulli.</p>
+      <p className="mt-2 text-ink-2">Three steps: prove you run this install, sign in with Plex, and connect Tautulli.</p>
       <div className="mt-10">
         <SetupWizard step={step} />
       </div>

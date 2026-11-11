@@ -1,9 +1,12 @@
 import 'server-only';
 import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 import { config } from '@playbill/core';
 import { SESSION_COOKIE, SESSION_TTL_MS, type Admin, validateSession } from '@playbill/core/auth';
 import { getDb } from '@playbill/core/db';
+import { getSetting } from '@playbill/core/settings';
+import { isSetupComplete } from '@playbill/core/setup';
 
 export const SETUP_COOKIE = 'playbill_setup';
 
@@ -58,4 +61,21 @@ export function handle<A extends unknown[]>(fn: (...args: A) => Promise<Response
 export function appInfo() {
   const c = config();
   return { version: c.version || '0.0.0-dev', revision: c.revision };
+}
+
+/** For admin pages: finished setup and a signed-in admin, or a redirect. */
+export async function requireAdmin(): Promise<Admin> {
+  if (!isSetupComplete(db())) redirect('/setup');
+  const admin = await currentAdmin();
+  if (!admin) redirect('/login');
+  return admin;
+}
+
+/** The owner's timezone for dates, schedules and peak hours. */
+export function timezone(): string {
+  return getSetting(db(), 'general')?.timezone ?? process.env.TZ ?? 'UTC';
+}
+
+export function serverName(): string {
+  return getSetting(db(), 'plex')?.name ?? 'Plex';
 }

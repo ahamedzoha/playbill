@@ -65,7 +65,7 @@ export function PlexSignIn({ label = 'Sign in with Plex' }: { label?: string }) 
         {status.kind === 'waiting' ? 'Waiting for Plex…' : label}
       </button>
       {status.kind === 'error' && (
-        <p role="alert" className="text-sm text-bad">
+        <p role="alert" className="text-sm text-red">
           {status.message}
         </p>
       )}

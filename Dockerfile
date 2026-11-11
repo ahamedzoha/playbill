@@ -57,6 +57,7 @@ WORKDIR /app
 COPY --from=build /out/worker ./worker
 COPY --from=build /app/apps/web/.next/standalone ./web
 COPY --from=build /app/apps/web/.next/static ./web/apps/web/.next/static
+COPY --from=build /app/apps/web/public ./web/apps/web/public
 COPY docker/entrypoint.sh docker/supervisor.mjs ./
 RUN chmod +x entrypoint.sh && mkdir -p /config && chown node:node /config
 

@@ -21,15 +21,15 @@ async function post(url: string, body: unknown): Promise<{ ok: boolean; data: Re
 }
 
 const input =
-  'w-full rounded-md border border-line bg-surface px-3 py-2 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20';
+  'w-full rounded-md border border-rule bg-sheet px-3 py-2 outline-none focus:border-blue focus:outline-none';
 const primary =
-  'rounded-md bg-accent px-4 py-2.5 font-medium text-white transition hover:brightness-110 disabled:opacity-60';
+  'rounded-md bg-rail px-4 py-2.5 font-medium text-rail-ink transition-colors hover:bg-rail-active disabled:opacity-60';
 
 function Section({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (
-    <section className="space-y-4 rounded-lg border border-line bg-surface p-6">
+    <section className="space-y-4 rounded-lg border border-rule bg-sheet p-6">
       <h2 className="font-semibold">
-        <span className="mr-2 text-muted">{n}.</span>
+        <span className="mr-2 text-ink-2">{n}.</span>
         {title}
       </h2>
       {children}
@@ -39,7 +39,7 @@ function Section({ n, title, children }: { n: number; title: string; children: R
 
 function ErrorText({ message }: { message: string | null }) {
   return message ? (
-    <p role="alert" className="text-sm text-bad">
+    <p role="alert" className="text-sm text-red">
       {message}
     </p>
   ) : null;
@@ -61,10 +61,10 @@ function CodeStep({ onDone }: { onDone: () => void }) {
 
   return (
     <Section n={1} title="Enter the setup code">
-      <p className="text-sm text-muted">
+      <p className="text-sm text-ink-2">
         Playbill printed a one-time code when it started. Find it with{' '}
-        <code className="rounded bg-canvas px-1">docker logs playbill</code> or in{' '}
-        <code className="rounded bg-canvas px-1">setup-code.txt</code> in your config folder.
+        <code className="rounded bg-paper px-1">docker logs playbill</code> or in{' '}
+        <code className="rounded bg-paper px-1">setup-code.txt</code> in your config folder.
       </p>
       <form onSubmit={submit} className="flex gap-3">
         <input
@@ -115,14 +115,14 @@ function ServerStep() {
 
   return (
     <Section n={2} title="Choose your Plex server">
-      {servers === null && !error && <p className="text-sm text-muted">Asking plex.tv for your servers…</p>}
-      {servers?.length === 0 && <p className="text-sm text-bad">This Plex account doesn't own a server.</p>}
+      {servers === null && !error && <p className="text-sm text-ink-2">Asking plex.tv for your servers…</p>}
+      {servers?.length === 0 && <p className="text-sm text-red">This Plex account doesn't own a server.</p>}
       {servers && servers.length > 0 && (
         <form onSubmit={submit} className="space-y-4">
           <fieldset className="space-y-2">
             <legend className="sr-only">Server</legend>
             {servers.map((s) => (
-              <label key={s.machineId} className="flex items-center gap-3 rounded-md border border-line p-3">
+              <label key={s.machineId} className="flex items-center gap-3 rounded-md border border-rule p-3">
                 <input
                   type="radio"
                   name="server"
@@ -131,12 +131,12 @@ function ServerStep() {
                   onChange={() => setChoice(s.machineId)}
                 />
                 <span className="font-medium">{s.name}</span>
-                <span className="text-xs text-muted">{s.connections.length} known addresses</span>
+                <span className="text-xs text-ink-2">{s.connections.length} known addresses</span>
               </label>
             ))}
           </fieldset>
           <label className="block space-y-1 text-sm">
-            <span className="text-muted">Address Playbill should use (optional)</span>
+            <span className="text-ink-2">Address Playbill should use (optional)</span>
             <input
               className={input}
               value={manualUrl}
@@ -144,7 +144,7 @@ function ServerStep() {
               placeholder="http://192.168.1.10:32400"
               inputMode="url"
             />
-            <span className="block text-xs text-muted">
+            <span className="block text-xs text-ink-2">
               Leave empty to try every address plex.tv knows, local ones first.
             </span>
           </label>
@@ -176,17 +176,17 @@ function TautulliStep() {
 
   return (
     <Section n={3} title="Connect Tautulli">
-      <p className="text-sm text-muted">
+      <p className="text-sm text-ink-2">
         Playbill reads watch history and users from Tautulli. Find the API key in Tautulli under Settings → Web
         Interface → API.
       </p>
       <form onSubmit={submit} className="space-y-4">
         <label className="block space-y-1 text-sm">
-          <span className="text-muted">Tautulli address</span>
+          <span className="text-ink-2">Tautulli address</span>
           <input className={input} value={url} onChange={(e) => setUrl(e.target.value)} inputMode="url" required />
         </label>
         <label className="block space-y-1 text-sm">
-          <span className="text-muted">API key</span>
+          <span className="text-ink-2">API key</span>
           <input
             className={`${input} font-mono`}
             value={apiKey}
@@ -211,7 +211,7 @@ export function SetupWizard({ step }: { step: WizardStep }) {
   if (step === 'code')
     return (
       <Section n={2} title="Sign in with Plex">
-        <p className="text-sm text-muted">Use the Plex account that owns your server. It becomes Playbill's owner.</p>
+        <p className="text-sm text-ink-2">Use the Plex account that owns your server. It becomes Playbill's owner.</p>
         <PlexSignIn />
       </Section>
     );

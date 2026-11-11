@@ -1,0 +1,944 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T06:56:56+00:00",
+  "title": "Design System: Playbill",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "#f3f5f9",
+        "oklch": "oklch(97.0% 0.006 264.5)",
+        "tonalRamp": [
+          "#0a0b0e",
+          "#242528",
+          "#404245",
+          "#5f6165",
+          "#808286",
+          "#a3a5a9",
+          "#c7c9cd",
+          "#eceef2"
+        ],
+        "dark": "#0e1218"
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "dark": "#151a22"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Register Ink",
+        "canonical": "#14171f",
+        "oklch": "oklch(20.5% 0.017 268.8)",
+        "tonalRamp": [
+          "#080b12",
+          "#22252d",
+          "#3e424b",
+          "#5d616b",
+          "#7e828d",
+          "#a1a5b0",
+          "#c4c9d4",
+          "#eaeefa"
+        ],
+        "dark": "#ecf0f6"
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Second Ink",
+        "canonical": "#4b5263",
+        "oklch": "oklch(43.9% 0.029 267.6)",
+        "tonalRamp": [
+          "#060a18",
+          "#1f2534",
+          "#3b4252",
+          "#5a6173",
+          "#7a8295",
+          "#9da5b8",
+          "#c1c9dd",
+          "#e6eeff"
+        ],
+        "dark": "#b3bccb"
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Third Ink",
+        "canonical": "#626a7b",
+        "oklch": "oklch(52.4% 0.029 265.4)",
+        "tonalRamp": [
+          "#060b17",
+          "#1e2533",
+          "#3b4252",
+          "#596172",
+          "#7a8294",
+          "#9ca5b8",
+          "#c0c9dc",
+          "#e5efff"
+        ],
+        "dark": "#939dae"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline Rule",
+        "canonical": "#e2e6ee",
+        "oklch": "oklch(92.4% 0.012 264.5)",
+        "tonalRamp": [
+          "#090b10",
+          "#22252b",
+          "#3f4248",
+          "#5e6168",
+          "#7f828a",
+          "#a1a5ad",
+          "#c5c9d1",
+          "#ebeff7"
+        ],
+        "dark": "#252c38"
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Rule",
+        "canonical": "#c9d0dc",
+        "oklch": "oklch(85.6% 0.018 261.3)",
+        "tonalRamp": [
+          "#070b13",
+          "#20252e",
+          "#3d424c",
+          "#5b626c",
+          "#7c838e",
+          "#9fa5b1",
+          "#c3cad5",
+          "#e8effb"
+        ],
+        "dark": "#343d4c"
+      },
+      "rail": {
+        "role": "secondary",
+        "displayName": "Register-Cover Navy",
+        "canonical": "#1b2c57",
+        "oklch": "oklch(30.4% 0.081 265.6)",
+        "tonalRamp": [
+          "#01052b",
+          "#12224c",
+          "#2d406d",
+          "#4b608f",
+          "#6b81b3",
+          "#8da4d8",
+          "#b0c9ff",
+          "#d6eeff"
+        ],
+        "dark": "#0f1a34"
+      },
+      "rail-ink": {
+        "role": "secondary",
+        "displayName": "Rail Ink",
+        "canonical": "#eef2fb",
+        "oklch": "oklch(96.1% 0.013 266.7)",
+        "tonalRamp": [
+          "#090b11",
+          "#22252b",
+          "#3f4249",
+          "#5e6169",
+          "#7f828a",
+          "#a1a5ad",
+          "#c5c9d2",
+          "#eaeef7"
+        ],
+        "dark": "#e6ebf7"
+      },
+      "rail-ink-2": {
+        "role": "secondary",
+        "displayName": "Rail Muted Ink",
+        "canonical": "#aebbd9",
+        "oklch": "oklch(79.2% 0.045 266.8)",
+        "tonalRamp": [
+          "#04091e",
+          "#1b243b",
+          "#37415a",
+          "#56617b",
+          "#76829e",
+          "#98a5c2",
+          "#bcc9e7",
+          "#e1eeff"
+        ],
+        "dark": "#94a2c4"
+      },
+      "rail-hover": {
+        "role": "secondary",
+        "displayName": "Rail Hover",
+        "canonical": "#22376a",
+        "oklch": "oklch(34.9% 0.093 265.1)",
+        "tonalRamp": [
+          "#01042e",
+          "#0e2051",
+          "#293f73",
+          "#475f96",
+          "#6781ba",
+          "#89a4e0",
+          "#acc9ff",
+          "#d3eeff"
+        ],
+        "dark": "#16244a"
+      },
+      "rail-active": {
+        "role": "secondary",
+        "displayName": "Rail Active",
+        "canonical": "#2b4384",
+        "oklch": "oklch(40.0% 0.113 266.2)",
+        "tonalRamp": [
+          "#010133",
+          "#0c1d5a",
+          "#263d7d",
+          "#435ea1",
+          "#6380c6",
+          "#84a3ec",
+          "#a8c8ff",
+          "#d0eeff"
+        ],
+        "dark": "#1f3266"
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "Register Blue",
+        "canonical": "#256abf",
+        "oklch": "oklch(52.7% 0.150 255.9)",
+        "tonalRamp": [
+          "#00003b",
+          "#001d65",
+          "#003d8f",
+          "#1960b4",
+          "#3f82da",
+          "#62a7ff",
+          "#8cccff",
+          "#b9f2ff"
+        ],
+        "dark": "#6da7ec"
+      },
+      "blue-wash": {
+        "role": "primary",
+        "displayName": "Blue Wash",
+        "canonical": "#eaf2fd",
+        "oklch": "oklch(95.8% 0.017 256.3)",
+        "tonalRamp": [
+          "#070b12",
+          "#20262d",
+          "#3c434b",
+          "#5b626b",
+          "#7c838d",
+          "#9ea6b0",
+          "#c2cad4",
+          "#e7effa"
+        ],
+        "dark": "#152238"
+      },
+      "red": {
+        "role": "tertiary",
+        "displayName": "Decision Red",
+        "canonical": "#c4373a",
+        "oklch": "oklch(55.0% 0.178 24.2)",
+        "tonalRamp": [
+          "#310000",
+          "#5b0000",
+          "#880005",
+          "#b02129",
+          "#d84b4a",
+          "#ff706c",
+          "#ff9d96",
+          "#ffc9c1"
+        ],
+        "dark": "#ec7070"
+      },
+      "red-wash": {
+        "role": "tertiary",
+        "displayName": "Decision Red Wash",
+        "canonical": "#fcefee",
+        "oklch": "oklch(96.2% 0.014 22.8)",
+        "tonalRamp": [
+          "#110908",
+          "#2c2222",
+          "#493f3e",
+          "#695e5d",
+          "#8b7f7e",
+          "#aea2a1",
+          "#d2c6c5",
+          "#f8ebea"
+        ],
+        "dark": "#2b181b"
+      },
+      "mark-0": {
+        "role": "primary",
+        "displayName": "Empty Slot",
+        "canonical": "#e6eaf1",
+        "oklch": "oklch(93.6% 0.010 261.8)",
+        "tonalRamp": [
+          "#e6eaf1",
+          "#86b6ef",
+          "#3987e5",
+          "#1c5cab",
+          "#0d366b"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #ffffff.",
+        "dark": "#1f2631"
+      },
+      "slot-line": {
+        "role": "neutral",
+        "displayName": "Slot Line",
+        "canonical": "#b9c1cf",
+        "oklch": "oklch(80.9% 0.022 261.8)",
+        "tonalRamp": [
+          "#060b14",
+          "#1f2530",
+          "#3c424e",
+          "#5b626e",
+          "#7b8390",
+          "#9ea5b3",
+          "#c1cad8",
+          "#e7effe"
+        ],
+        "dark": "#6b7588"
+      },
+      "mark-1": {
+        "role": "primary",
+        "displayName": "Ink Step 1 (under 1 h)",
+        "canonical": "#86b6ef",
+        "oklch": "oklch(76.4% 0.097 253.2)",
+        "tonalRamp": [
+          "#e6eaf1",
+          "#86b6ef",
+          "#3987e5",
+          "#1c5cab",
+          "#0d366b"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #ffffff.",
+        "dark": "#184f95"
+      },
+      "mark-2": {
+        "role": "primary",
+        "displayName": "Ink Step 2 (1-3 h)",
+        "canonical": "#3987e5",
+        "oklch": "oklch(62.2% 0.161 255.1)",
+        "tonalRamp": [
+          "#e6eaf1",
+          "#86b6ef",
+          "#3987e5",
+          "#1c5cab",
+          "#0d366b"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #ffffff.",
+        "dark": "#2a78d6"
+      },
+      "mark-3": {
+        "role": "primary",
+        "displayName": "Ink Step 3 (3-8 h)",
+        "canonical": "#1c5cab",
+        "oklch": "oklch(48.0% 0.142 256.1)",
+        "tonalRamp": [
+          "#e6eaf1",
+          "#86b6ef",
+          "#3987e5",
+          "#1c5cab",
+          "#0d366b"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #ffffff.",
+        "dark": "#5598e7"
+      },
+      "mark-4": {
+        "role": "primary",
+        "displayName": "Ink Step 4 (8 h+)",
+        "canonical": "#0d366b",
+        "oklch": "oklch(33.8% 0.103 256.9)",
+        "tonalRamp": [
+          "#e6eaf1",
+          "#86b6ef",
+          "#3987e5",
+          "#1c5cab",
+          "#0d366b"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #ffffff.",
+        "dark": "#9ec5f4"
+      },
+      "dark-paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper (dark)",
+        "canonical": "#0e1218",
+        "oklch": "oklch(18.1% 0.014 258.4)",
+        "tonalRamp": [
+          "#080b11",
+          "#21252c",
+          "#3d424a",
+          "#5c6269",
+          "#7d838b",
+          "#a0a5ae",
+          "#c4cad2",
+          "#e9eff8"
+        ]
+      },
+      "dark-sheet": {
+        "role": "neutral",
+        "displayName": "Sheet White (dark)",
+        "canonical": "#151a22",
+        "oklch": "oklch(21.6% 0.018 259.7)",
+        "tonalRamp": [
+          "#070b13",
+          "#20252e",
+          "#3d424c",
+          "#5b626b",
+          "#7c838d",
+          "#9fa5b0",
+          "#c3cad5",
+          "#e8effb"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Register Ink (dark)",
+        "canonical": "#ecf0f6",
+        "oklch": "oklch(95.4% 0.009 258.3)",
+        "tonalRamp": [
+          "#090b0f",
+          "#22252a",
+          "#3f4247",
+          "#5e6167",
+          "#7f8388",
+          "#a2a5ab",
+          "#c5c9cf",
+          "#ebeff5"
+        ]
+      },
+      "dark-ink-2": {
+        "role": "neutral",
+        "displayName": "Second Ink (dark)",
+        "canonical": "#b3bccb",
+        "oklch": "oklch(79.3% 0.023 260.7)",
+        "tonalRamp": [
+          "#060b15",
+          "#1f2531",
+          "#3b424f",
+          "#5a626f",
+          "#7a8391",
+          "#9da6b4",
+          "#c1cad9",
+          "#e6efff"
+        ]
+      },
+      "dark-ink-3": {
+        "role": "neutral",
+        "displayName": "Third Ink (dark)",
+        "canonical": "#939dae",
+        "oklch": "oklch(69.4% 0.027 261.1)",
+        "tonalRamp": [
+          "#050b17",
+          "#1e2533",
+          "#3a4251",
+          "#596271",
+          "#798393",
+          "#9ca6b7",
+          "#bfcadc",
+          "#e4efff"
+        ]
+      },
+      "dark-rule": {
+        "role": "neutral",
+        "displayName": "Hairline Rule (dark)",
+        "canonical": "#252c38",
+        "oklch": "oklch(29.2% 0.024 261.1)",
+        "tonalRamp": [
+          "#060b15",
+          "#1e2531",
+          "#3b424f",
+          "#5a626f",
+          "#7a8391",
+          "#9da6b5",
+          "#c0cad9",
+          "#e6efff"
+        ]
+      },
+      "dark-rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Rule (dark)",
+        "canonical": "#343d4c",
+        "oklch": "oklch(35.8% 0.029 260.6)",
+        "tonalRamp": [
+          "#050b17",
+          "#1d2533",
+          "#394252",
+          "#586272",
+          "#798394",
+          "#9ba6b8",
+          "#bfcadc",
+          "#e4efff"
+        ]
+      },
+      "dark-rail": {
+        "role": "secondary",
+        "displayName": "Register-Cover Navy (dark)",
+        "canonical": "#0f1a34",
+        "oklch": "oklch(22.3% 0.053 265.1)",
+        "tonalRamp": [
+          "#030921",
+          "#18243f",
+          "#34415f",
+          "#526180",
+          "#7382a3",
+          "#95a5c7",
+          "#b8c9ed",
+          "#ddefff"
+        ]
+      },
+      "dark-rail-ink": {
+        "role": "secondary",
+        "displayName": "Rail Ink (dark)",
+        "canonical": "#e6ebf7",
+        "oklch": "oklch(94.0% 0.017 267.8)",
+        "tonalRamp": [
+          "#080b12",
+          "#21252e",
+          "#3e424b",
+          "#5d616b",
+          "#7e828d",
+          "#a0a5b0",
+          "#c4c9d5",
+          "#e9eefa"
+        ]
+      },
+      "dark-rail-ink-2": {
+        "role": "secondary",
+        "displayName": "Rail Muted Ink (dark)",
+        "canonical": "#94a2c4",
+        "oklch": "oklch(71.3% 0.052 267.5)",
+        "tonalRamp": [
+          "#040921",
+          "#1a243e",
+          "#36415e",
+          "#546180",
+          "#7482a2",
+          "#97a5c7",
+          "#bac9ec",
+          "#dfeeff"
+        ]
+      },
+      "dark-rail-hover": {
+        "role": "secondary",
+        "displayName": "Rail Hover (dark)",
+        "canonical": "#16244a",
+        "oklch": "oklch(27.1% 0.073 266.4)",
+        "tonalRamp": [
+          "#020629",
+          "#142248",
+          "#304069",
+          "#4e608b",
+          "#6e81af",
+          "#90a4d4",
+          "#b3c9fa",
+          "#d8eeff"
+        ]
+      },
+      "dark-rail-active": {
+        "role": "secondary",
+        "displayName": "Rail Active (dark)",
+        "canonical": "#1f3266",
+        "oklch": "oklch(33.2% 0.095 266.3)",
+        "tonalRamp": [
+          "#01032f",
+          "#0f2052",
+          "#2a3f74",
+          "#485f97",
+          "#6881bb",
+          "#89a4e1",
+          "#adc8ff",
+          "#d4eeff"
+        ]
+      },
+      "dark-blue": {
+        "role": "primary",
+        "displayName": "Register Blue (dark)",
+        "canonical": "#6da7ec",
+        "oklch": "oklch(71.7% 0.118 253.6)",
+        "tonalRamp": [
+          "#000433",
+          "#00225a",
+          "#01417e",
+          "#2a62a2",
+          "#4c85c7",
+          "#6ea8ed",
+          "#94cdff",
+          "#bff3ff"
+        ]
+      },
+      "dark-blue-wash": {
+        "role": "primary",
+        "displayName": "Blue Wash (dark)",
+        "canonical": "#152238",
+        "oklch": "oklch(25.2% 0.046 260.5)",
+        "tonalRamp": [
+          "#020a1e",
+          "#18253b",
+          "#34425b",
+          "#52627c",
+          "#73839e",
+          "#95a6c2",
+          "#b8cae8",
+          "#ddf0ff"
+        ]
+      },
+      "dark-red": {
+        "role": "tertiary",
+        "displayName": "Decision Red (dark)",
+        "canonical": "#ec7070",
+        "oklch": "oklch(69.2% 0.154 21.9)",
+        "tonalRamp": [
+          "#2e0000",
+          "#560000",
+          "#800018",
+          "#a73137",
+          "#ce5557",
+          "#f67979",
+          "#ffa3a0",
+          "#ffcdca"
+        ]
+      },
+      "dark-red-wash": {
+        "role": "tertiary",
+        "displayName": "Decision Red Wash (dark)",
+        "canonical": "#2b181b",
+        "oklch": "oklch(23.6% 0.031 9.4)",
+        "tonalRamp": [
+          "#160608",
+          "#321f22",
+          "#513b3e",
+          "#725a5d",
+          "#947b7e",
+          "#b79da1",
+          "#dcc1c5",
+          "#ffe6ea"
+        ]
+      },
+      "dark-mark-0": {
+        "role": "primary",
+        "displayName": "Empty Slot (dark)",
+        "canonical": "#1f2631",
+        "oklch": "oklch(26.7% 0.023 259.3)",
+        "tonalRamp": [
+          "#1f2631",
+          "#184f95",
+          "#2a78d6",
+          "#5598e7",
+          "#9ec5f4"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      },
+      "dark-slot-line": {
+        "role": "neutral",
+        "displayName": "Slot Line (dark)",
+        "canonical": "#6b7588",
+        "oklch": "oklch(56.1% 0.032 263.3)",
+        "tonalRamp": [
+          "#050b19",
+          "#1d2535",
+          "#394253",
+          "#586174",
+          "#788396",
+          "#9ba5ba",
+          "#becadf",
+          "#e3efff"
+        ]
+      },
+      "dark-mark-1": {
+        "role": "primary",
+        "displayName": "Ink Step 1 (under 1 h) (dark)",
+        "canonical": "#184f95",
+        "oklch": "oklch(43.3% 0.128 256.5)",
+        "tonalRamp": [
+          "#1f2631",
+          "#184f95",
+          "#2a78d6",
+          "#5598e7",
+          "#9ec5f4"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      },
+      "dark-mark-2": {
+        "role": "primary",
+        "displayName": "Ink Step 2 (1-3 h) (dark)",
+        "canonical": "#2a78d6",
+        "oklch": "oklch(57.5% 0.163 255.5)",
+        "tonalRamp": [
+          "#1f2631",
+          "#184f95",
+          "#2a78d6",
+          "#5598e7",
+          "#9ec5f4"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      },
+      "dark-mark-3": {
+        "role": "primary",
+        "displayName": "Ink Step 3 (3-8 h) (dark)",
+        "canonical": "#5598e7",
+        "oklch": "oklch(67.1% 0.136 253.8)",
+        "tonalRamp": [
+          "#1f2631",
+          "#184f95",
+          "#2a78d6",
+          "#5598e7",
+          "#9ec5f4"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      },
+      "dark-mark-4": {
+        "role": "primary",
+        "displayName": "Ink Step 4 (8 h+) (dark)",
+        "canonical": "#9ec5f4",
+        "oklch": "oklch(81.2% 0.079 253.4)",
+        "tonalRamp": [
+          "#1f2631",
+          "#184f95",
+          "#2a78d6",
+          "#5598e7",
+          "#9ec5f4"
+        ],
+        "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The page sentence headline, a person name, page title; one per page, below 640px."
+      },
+      "display-wide": {
+        "displayName": "Display (wide)",
+        "purpose": "The same headline from 640px up."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Summary sentences, max 70ch."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Table cells, status labels, links, buttons, inputs, tooltips."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Register keys, chart captions, sync notes, tab-bar labels."
+      },
+      "label": {
+        "displayName": "Printed Caps",
+        "purpose": "Column heads, tooltip date lines, quarter labels. Uppercase."
+      },
+      "label-tick": {
+        "displayName": "Tick Caps",
+        "purpose": "Month and Now ticks over register columns, weekday labels on the peak grid. Uppercase."
+      },
+      "figures": {
+        "displayName": "Ledger Figures",
+        "purpose": "Applied to every number: font-variant-numeric: tabular-nums."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tooltip-lift",
+        "value": "0 1px 2px rgb(20 23 31 / 0.04), 0 6px 18px -8px rgb(20 23 31 / 0.12)",
+        "purpose": "Floating readouts over marks, cells and bars only. Light mode."
+      },
+      {
+        "name": "tooltip-lift-dark",
+        "value": "0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5)",
+        "purpose": "Same role in dark mode."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ink-in",
+        "value": "420ms cubic-bezier(0.16, 1, 0.3, 1), from opacity 0.45 scale 0.55, stagger 18ms per mark",
+        "purpose": "Marks ink in left to right when the range changes; disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "state-color",
+        "value": "150ms (Tailwind transition-colors default)",
+        "purpose": "Hover colour changes on nav, chips, segments, buttons."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "note": "Rail replaces top bar and tab bar."
+      },
+      {
+        "name": "xl",
+        "value": "1280px",
+        "note": "Two-column page layouts."
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
+    ],
+    "focus": {
+      "value": "2px solid var(--focus), offset 2px, radius 4px",
+      "purpose": "Global :focus-visible; inputs use a blue border instead."
+    },
+    "themes": {
+      "mechanism": "prefers-color-scheme with data-theme=\"light\"|\"dark\" override on <html>, persisted in localStorage key playbill-theme and applied before first paint.",
+      "darkTokens": "Frontmatter colors prefixed dark-."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid action per form, in register-cover navy.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Save</button>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-btn-primary{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;background:var(--rail);color:var(--rail-ink);border:0;border-radius:8px;padding:8px 16px;font-size:.875rem;font-weight:500;cursor:pointer;transition:background-color .15s}.ds-btn-primary:hover{background:var(--rail-active)}.ds-btn-primary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ds-btn-primary:disabled{opacity:.6}"
+    },
+    {
+      "name": "Action Link",
+      "kind": "button",
+      "refersTo": "link-action",
+      "description": "Sentence-level action with a trailing arrow; red variant only for owner decisions.",
+      "html": "<div class=\"ds-links\"><a class=\"ds-link\" href=\"#\">See all 14 in People <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a><a class=\"ds-link ds-link-decision\" href=\"#\">Review removals <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-links{display:flex;gap:24px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-link{display:inline-flex;align-items:center;gap:4px;font-size:.875rem;font-weight:500;color:var(--blue);text-decoration:none;text-underline-offset:3px}.ds-link:hover{text-decoration:underline}.ds-link:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}.ds-link-decision{color:var(--red)}"
+    },
+    {
+      "name": "Range Control",
+      "kind": "custom",
+      "refersTo": "range-control",
+      "description": "Segmented 7/30/90-day links; selection lives in the URL.",
+      "html": "<div class=\"ds-range\" role=\"group\" aria-label=\"Time range\"><a class=\"ds-seg ds-seg-on\" href=\"#\" aria-current=\"true\">7 days</a><a class=\"ds-seg\" href=\"#\">30 days</a><a class=\"ds-seg\" href=\"#\">90 days</a></div>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-range{display:inline-flex;padding:2px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-seg{font-variant-numeric:tabular-nums;font-size:.875rem;padding:6px 12px;border-radius:6px;color:var(--ink-2);text-decoration:none;transition:background-color .15s,color .15s}.ds-seg:hover{background:var(--paper);color:var(--ink)}.ds-seg:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ds-seg-on,.ds-seg-on:hover{background:var(--rail);color:var(--rail-ink)}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Round status filter with its state mark and a tabular count.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\" type=\"button\" aria-pressed=\"true\">Everyone <span class=\"ds-n\">41</span></button><button class=\"ds-chip\" type=\"button\"><svg width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" aria-hidden=\"true\"><rect x=\".75\" y=\".75\" width=\"8.5\" height=\"8.5\" rx=\"2.4\" fill=\"none\" stroke=\"var(--mark-2)\" stroke-width=\"1.5\"/></svg>Gone quiet <span class=\"ds-n\">6</span></button></div>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-chips{display:flex;gap:6px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink-2);border-radius:9999px;padding:6px 12px;font:inherit;font-size:.875rem;cursor:pointer;transition:border-color .15s,color .15s}.ds-chip:hover{border-color:var(--rule-strong);color:var(--ink)}.ds-chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ds-n{font-variant-numeric:tabular-nums;color:var(--ink-3)}.ds-chip-on,.ds-chip-on:hover{background:var(--rail);border-color:var(--rail);color:var(--rail-ink)}.ds-chip-on .ds-n{color:var(--rail-ink-2)}"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Hairline field; focus moves the border to register blue.",
+      "html": "<label class=\"ds-field\"><svg class=\"ds-ico\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input class=\"ds-input\" placeholder=\"Search people\"></label>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-field{position:relative;display:block;width:320px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3)}.ds-input{width:100%;box-sizing:border-box;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink);padding:8px 12px 8px 36px;font:inherit;font-size:.875rem}.ds-input::placeholder{color:var(--ink-3)}.ds-input:focus{outline:none;border-color:var(--blue)}"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Register-cover rail with icon links; current page on a raised navy step.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-nav ds-nav-on\" href=\"#\" aria-current=\"page\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><path d=\"M14 4h7M14 9h7M14 15h7M14 20h7\"/></svg>Overview</a><a class=\"ds-nav\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/></svg>People</a></nav>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-rail{display:flex;flex-direction:column;gap:2px;width:216px;padding:12px;background:var(--rail);font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-nav{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;font-size:.9375rem;color:var(--rail-ink-2);text-decoration:none;transition:background-color .15s,color .15s}.ds-nav:hover{background:var(--rail-hover);color:var(--rail-ink)}.ds-nav:focus-visible{outline:2px solid #6da7ec;outline-offset:2px}.ds-nav-on,.ds-nav-on:hover{background:var(--rail-active);color:var(--rail-ink)}"
+    },
+    {
+      "name": "Sheet",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "Flat white container with a hairline border and a ruled table head; no shadow.",
+      "html": "<section class=\"ds-sheet\"><h2 class=\"ds-title\">People to check on</h2><div class=\"ds-head\">Person</div><div class=\"ds-row\">Maya Chen</div><div class=\"ds-row\">Tom Okafor</div></section>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-sheet{width:360px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;color:var(--ink);font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;}.ds-title{margin:0;padding:20px 20px 16px;font-size:1.125rem;font-weight:600;letter-spacing:-.01em}.ds-head{font-family:'Barlow Condensed','Hanken Grotesk',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.8125rem;line-height:1;color:var(--ink-3);padding:10px 20px;border-top:1px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong)}.ds-row{padding:12px 20px;font-weight:500;border-bottom:1px solid var(--rule)}.ds-row:last-child{border-bottom:0}.ds-row:hover{background:rgb(243 245 249 / .6)}"
+    },
+    {
+      "name": "Register Strip",
+      "kind": "custom",
+      "refersTo": "register-mark",
+      "description": "Signature: one rounded-square mark per week on the shared ink ramp, with an open slot before joining and a hover readout.",
+      "html": "<div class=\"ds-strip\" tabindex=\"0\" aria-label=\"Watched in 9 of the last 12 weeks\"><span class=\"ds-mark ds-slot\" style=\"--i:0\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:1\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:2\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:3\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:4\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:5\"></span><span class=\"ds-mark\" style=\"background:var(--mark-4);--i:6\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:7\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:8\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:9\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:10\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:11\"></span><div class=\"ds-tip\" role=\"tooltip\"><p class=\"ds-tip-d\">3 Nov – 9 Nov</p><p class=\"ds-tip-v\">7 plays · 5.5 h</p><p class=\"ds-tip-x\">Mostly Severance</p></div></div>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}@keyframes ds-ink{from{opacity:.45;transform:scale(.55)}to{opacity:1;transform:scale(1)}}.ds-strip{position:relative;display:inline-flex;gap:3px;margin-top:84px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;border-radius:4px}.ds-strip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ds-mark{display:block;width:13px;height:13px;border-radius:3px;animation:ds-ink 420ms cubic-bezier(.16,1,.3,1) both}.ds-mark:nth-child(n){animation-delay:calc(var(--i,0)*18ms)}.ds-mark:hover{outline:2px solid var(--ink);outline-offset:1px}.ds-slot{background:transparent;box-shadow:inset 0 0 0 1px var(--slot-line)}.ds-tip{position:absolute;bottom:100%;left:60%;transform:translateX(-50%);margin-bottom:8px;width:max-content;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;font-size:.875rem;box-shadow:0 1px 2px rgb(20 23 31 / .04),0 6px 18px -8px rgb(20 23 31 / .12)}.ds-tip p{margin:0}.ds-tip-d{font-family:'Barlow Condensed','Hanken Grotesk',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.8125rem;line-height:1;color:var(--ink-3)}.ds-tip-v{margin-top:4px!important;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}.ds-tip-x{color:var(--ink-2)}@media (prefers-reduced-motion:reduce){.ds-mark{animation:none}}"
+    },
+    {
+      "name": "Status Marks",
+      "kind": "custom",
+      "refersTo": "register-mark",
+      "description": "The one state vocabulary: filled, half, outline, dotted, dashed, struck, each with a plain label.",
+      "html": "<ul class=\"ds-status\"><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"var(--mark-3)\" stroke=\"var(--mark-3)\" stroke-width=\"1.5\"/></svg>Active</li><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"none\" stroke=\"var(--mark-2)\" stroke-width=\"1.5\"/><rect x=\".75\" y=\".75\" width=\"5.25\" height=\"10.5\" rx=\"2.9\" fill=\"var(--mark-2)\"/><rect x=\"3.1\" y=\".75\" width=\"2.9\" height=\"10.5\" fill=\"var(--mark-2)\"/></svg>Slowing down</li><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"none\" stroke=\"var(--mark-2)\" stroke-width=\"1.5\"/></svg>Gone quiet</li><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"none\" stroke=\"var(--ink-3)\" stroke-width=\"1.5\" stroke-dasharray=\"1 2.2\" stroke-linecap=\"round\"/></svg>Never watched</li><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"none\" stroke=\"var(--mark-2)\" stroke-width=\"1.5\" stroke-dasharray=\"3 2\"/></svg>Invite pending</li><li><svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><rect x=\".75\" y=\".75\" width=\"10.5\" height=\"10.5\" rx=\"2.9\" fill=\"none\" stroke=\"var(--ink-3)\" stroke-width=\"1.5\"/><path d=\"M2.64 9.36 9.36 2.64\" stroke=\"var(--ink-3)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>Removed</li><li><span class=\"ds-slotkey\"></span>Not yet joined</li></ul>",
+      "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}.ds-status{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.875rem;color:var(--ink-2)}.ds-status li{display:flex;align-items:center;gap:8px}.ds-slotkey{display:block;width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px var(--slot-line)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Attendance Register",
+    "overview": "Playbill's admin UI is a ruled register on cool paper-white, bound under a deep register-cover blue rail. Every person is a row and every week is a mark, so who has been around and who has drifted reads at a glance. The register strip, one square mark per week on one shared weekly scale, is the world's repeated form: it appears at 12 weeks on Overview and People, at 52 weeks (four 13-week quarters) on a person's page, as the peak-hours grid, and even as the two-row wordmark beside the product name.\n\nThe surface is calm and dense, the density of a well-kept ledger rather than a dashboard. Numbers live in sentences (\"12 of 41 people watched in the last 7 days\") and in ruled tables, never in stat tiles. Sheets are flat white with hairline rules; column heads are condensed printed caps; names and prose are set in a warm humanist grotesk. Colour is almost entirely one blue ink, stepped by how much someone watched; red ink is held back for the owner. In dark mode the paper becomes a blue-black, the rail deepens, and the ink ramp inverts so the strongest week is still the most visible mark.\n\nMotion has one gesture: when the range changes, marks ink in from left to right (420ms, 18ms stagger per mark), and it is switched off under reduced motion.",
+    "keyCharacteristics": [
+      "One shared weekly scale, drawn as rounded square marks in an ordinal blue ramp, everywhere attendance appears.",
+      "One state-mark vocabulary for status: filled, half, outline, dotted, dashed, struck, plus the open \"not yet joined\" slot.",
+      "Flat white sheets with hairline borders on a cool grey paper; shadow only on floating tooltips.",
+      "Condensed uppercase caps for column heads and tick labels; humanist grotesk for everything a person reads.",
+      "Tabular figures for every number, so columns of counts and hours align like a ledger.",
+      "Red only where the owner has to act."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Attendance and volume are only ever drawn in the `mark-0` to `mark-4` ramp. No second hue, no gradient, no categorical palette; a mark's darkness is its quantity.",
+        "section": "colors"
+      },
+      {
+        "name": "The Owner's Red Rule",
+        "body": "Red appears only where the owner must act: a removal or warning awaiting their decision, or something broken they must fix. It is never decoration, never a trend colour, never an \"inactive\" signal. A screen with nothing for the owner to do has no red on it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Shared Scale Rule",
+        "body": "The four hour bands (under 1 h, 1-3 h, 3-8 h, 8 h+) mean the same thing on every page, and every register carries its key.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ledger Figures Rule",
+        "body": "Every number is set in tabular figures (the `num` utility, `font-variant-numeric: tabular-nums`): headline counts, range segments, filter counts, plays, hours, dates, axis labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Head Rule",
+        "body": "Condensed caps are for structural labels that sit over or beside data (column heads, ticks, tooltip date lines). Never for sentences, names, buttons or headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Border-Not-Shadow Rule",
+        "body": "Sheets are bordered, never shadowed. A shadow means \"this is floating over the page, briefly\"; only tooltips earn it.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** draw any per-week or per-hour quantity as rounded-square marks in the `mark-0` to `mark-4` ramp, on the shared hour bands, with a key.",
+      "**Do** state a person's segment with the status-mark vocabulary (filled, half, outline, dotted, dashed, struck, open slot) plus a plain label.",
+      "**Do** put numbers in sentences and ruled tables, and set every number with tabular figures.",
+      "**Do** separate content with 1px `rule` hairlines and a `rule-strong` line around table heads.",
+      "**Do** use `rail` navy for the single primary action and for selected states.",
+      "**Do** keep column heads and ticks in Barlow Condensed caps at 0.8125rem / 0.06em, and everything else in Hanken Grotesk.",
+      "**Do** honour reduced motion: the ink-in animation is the only motion and it switches off."
+    ],
+    "donts": [
+      "**Don't** build KPI stat tiles or big-number cards; the headline is a sentence.",
+      "**Don't** use red for anything other than an owner decision or a failure the owner must fix.",
+      "**Don't** introduce a second data hue or a categorical palette for attendance.",
+      "**Don't** put a shadow on a sheet, card or panel; shadows are for tooltips only.",
+      "**Don't** signal state by colour alone; the mark's shape must carry it.",
+      "**Don't** set sentences, names or buttons in condensed caps."
+    ]
+  }
+}

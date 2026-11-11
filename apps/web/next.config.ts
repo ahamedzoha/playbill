@@ -8,6 +8,7 @@ const config: NextConfig = {
   transpilePackages: ['@playbill/core'],
   serverExternalPackages: ['better-sqlite3'],
   poweredByHeader: false,
+  devIndicators: false,
   reactStrictMode: true,
   async headers() {
     return [

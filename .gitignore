@@ -10,5 +10,8 @@ coverage/
 playwright-report/
 test-results/
 .DS_Store
-.impeccable/review/
-.impeccable/config.local.json
+**/.impeccable/review/
+**/.impeccable/config.local.json
+**/.impeccable/decision-*.json
+**/.impeccable/mocks/
+**/.impeccable/questions/

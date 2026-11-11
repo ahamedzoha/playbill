@@ -1,36 +1,192 @@
 @import 'tailwindcss';
 
 /*
- * Placeholder tokens for P0. The real visual system comes from the impeccable design round (P1);
- * keep components on these tokens so the restyle is a token swap, not a rewrite.
+ * Playbill: the attendance register.
+ * Paper-white sheets with hairline rules under a register-cover blue rail. Weekly marks in one blue
+ * ink ramp (validated light and dark, ordinal). Red ink is reserved for things that need the
+ * owner's decision and is used for nothing else.
  */
-@theme {
-  --color-canvas: #faf8f5;
-  --color-surface: #ffffff;
-  --color-ink: #1c1a17;
-  --color-muted: #6b665e;
-  --color-line: #e6e1d8;
-  --color-accent: #b4532a;
-  --color-ok: #2f7d4f;
-  --color-bad: #b42a2a;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  color-scheme: light;
+  --paper: #f3f5f9;
+  --sheet: #ffffff;
+  --ink: #14171f;
+  --ink-2: #4b5263;
+  --ink-3: #626a7b;
+  --rule: #e2e6ee;
+  --rule-strong: #c9d0dc;
+  --rail: #1b2c57;
+  --rail-ink: #eef2fb;
+  --rail-ink-2: #aebbd9;
+  --rail-hover: #22376a;
+  --rail-active: #2b4384;
+  --blue: #256abf;
+  --blue-wash: #eaf2fd;
+  --red: #c4373a;
+  --red-wash: #fcefee;
+  --mark-0: #e6eaf1;
+  --slot-line: #b9c1cf;
+  --mark-1: #86b6ef;
+  --mark-2: #3987e5;
+  --mark-3: #1c5cab;
+  --mark-4: #0d366b;
+  --focus: #256abf;
+  --shadow: 0 1px 2px rgb(20 23 31 / 0.04), 0 6px 18px -8px rgb(20 23 31 / 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-canvas: #151311;
-    --color-surface: #1e1b18;
-    --color-ink: #f2eee8;
-    --color-muted: #a39d93;
-    --color-line: #34302b;
-    --color-accent: #e07a4c;
-    --color-ok: #5cb27f;
-    --color-bad: #e06a6a;
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+    --paper: #0e1218;
+    --sheet: #151a22;
+    --ink: #ecf0f6;
+    --ink-2: #b3bccb;
+    --ink-3: #939dae;
+    --rule: #252c38;
+    --rule-strong: #343d4c;
+    --rail: #0f1a34;
+    --rail-ink: #e6ebf7;
+    --rail-ink-2: #94a2c4;
+    --rail-hover: #16244a;
+    --rail-active: #1f3266;
+    --blue: #6da7ec;
+    --blue-wash: #152238;
+    --red: #ec7070;
+    --red-wash: #2b181b;
+    --mark-0: #1f2631;
+    --slot-line: #6b7588;
+    --mark-1: #184f95;
+    --mark-2: #2a78d6;
+    --mark-3: #5598e7;
+    --mark-4: #9ec5f4;
+    --focus: #6da7ec;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
   }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #0e1218;
+  --sheet: #151a22;
+  --ink: #ecf0f6;
+  --ink-2: #b3bccb;
+  --ink-3: #939dae;
+  --rule: #252c38;
+  --rule-strong: #343d4c;
+  --rail: #0f1a34;
+  --rail-ink: #e6ebf7;
+  --rail-ink-2: #94a2c4;
+  --rail-hover: #16244a;
+  --rail-active: #1f3266;
+  --blue: #6da7ec;
+  --blue-wash: #152238;
+  --red: #ec7070;
+  --red-wash: #2b181b;
+  --mark-0: #1f2631;
+  --slot-line: #6b7588;
+  --mark-1: #184f95;
+  --mark-2: #2a78d6;
+  --mark-3: #5598e7;
+  --mark-4: #9ec5f4;
+  --focus: #6da7ec;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -10px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-rail: var(--rail);
+  --color-rail-ink: var(--rail-ink);
+  --color-rail-ink-2: var(--rail-ink-2);
+  --color-rail-hover: var(--rail-hover);
+  --color-rail-active: var(--rail-active);
+  --color-blue: var(--blue);
+  --color-blue-wash: var(--blue-wash);
+  --color-red: var(--red);
+  --color-red-wash: var(--red-wash);
+  --color-mark-0: var(--mark-0);
+  --color-mark-1: var(--mark-1);
+  --color-mark-2: var(--mark-2);
+  --color-mark-3: var(--mark-3);
+  --color-mark-4: var(--mark-4);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-caps: var(--font-heads), var(--font-body), ui-sans-serif, sans-serif;
+  --shadow-sheet: var(--shadow);
 }
 
 html,
 body {
-  background: var(--color-canvas);
-  color: var(--color-ink);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--blue) 28%, transparent);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+}
+
+a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* Printed column heads: condensed caps, like a register's ruled header. */
+.caps {
+  font-family: var(--font-caps);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The signature motion: marks ink in left to right when the range changes. */
+@keyframes ink-in {
+  from {
+    opacity: 0.45;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.mark-ink {
+  animation: ink-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 18ms);
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark-ink {
+    animation: none;
+  }
 }
