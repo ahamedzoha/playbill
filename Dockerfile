@@ -20,6 +20,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/
 COPY apps/worker/package.json apps/worker/
 COPY packages/core/package.json packages/core/
+COPY packages/emails/package.json packages/emails/
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm --filter @playbill/worker build && pnpm --filter @playbill/web build

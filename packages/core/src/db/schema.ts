@@ -255,3 +255,106 @@ export const syncState = sqliteTable('sync_state', {
   lastOkAt: integer('last_ok_at'),
   lastError: text('last_error'),
 });
+
+// ---------------------------------------------------------------------------------------------
+// Newsletters (P2). A campaign is a recurring email; each occurrence is a run; each recipient of a
+// run is a delivery. Unique keys make every step safe to repeat after a crash.
+
+/** Per-person opt-out by topic. A missing row means the topic's default (subscribed). */
+export const preferences = sqliteTable(
+  'preferences',
+  {
+    plexUserId: text('plex_user_id').notNull(),
+    topic: text('topic').notNull(),
+    subscribed: integer('subscribed', { mode: 'boolean' }).notNull(),
+    updatedAt: integer('updated_at').notNull(),
+    /** 'recipient' (they clicked), 'owner' (set in the admin UI), 'import'. */
+    source: text('source').notNull(),
+  },
+  (t) => [uniqueIndex('preferences_person_topic_idx').on(t.plexUserId, t.topic)],
+);
+
+/** Addresses that must never be mailed: unsubscribe-all, hard bounce, spam complaint, manual. */
+export const suppressions = sqliteTable('suppressions', {
+  email: text('email').primaryKey(),
+  reason: text('reason', { enum: ['unsubscribed', 'bounced', 'complained', 'manual'] }).notNull(),
+  detail: text('detail'),
+  at: integer('at').notNull(),
+});
+
+export const campaigns = sqliteTable('campaigns', {
+  id: text('id').primaryKey(),
+  kind: text('kind', { enum: ['digest'] }).notNull(),
+  name: text('name').notNull(),
+  topic: text('topic').notNull(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
+  /**
+   * 'test' sends only to the test addresses; 'live' sends to the audience.
+   * New campaigns start in test mode; only the owner can switch to live.
+   */
+  mode: text('mode', { enum: ['test', 'live'] }).notNull().default('test'),
+  cron: text('cron').notNull(),
+  /** Campaign settings: sections, subject, intro, test addresses. Validated by zod in campaigns.ts. */
+  settings: text('settings', { mode: 'json' }).$type<Record<string, unknown>>().notNull(),
+  lastOccurrence: integer('last_occurrence'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+export const runs = sqliteTable(
+  'runs',
+  {
+    id: text('id').primaryKey(),
+    campaignId: text('campaign_id')
+      .notNull()
+      .references(() => campaigns.id, { onDelete: 'cascade' }),
+    /** One run per campaign occurrence (ISO time), or 'manual:<id>' for a send-now/test. */
+    windowKey: text('window_key').notNull(),
+    trigger: text('trigger', { enum: ['schedule', 'manual', 'test'] }).notNull(),
+    status: text('status', { enum: ['planned', 'frozen', 'sending', 'done', 'deferred', 'failed', 'skipped'] }).notNull(),
+    /** The content snapshot every delivery of this run renders from, so retries send the same email. */
+    content: text('content', { mode: 'json' }).$type<Record<string, unknown>>(),
+    note: text('note'),
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (t) => [uniqueIndex('runs_campaign_window_idx').on(t.campaignId, t.windowKey), index('runs_status_idx').on(t.status)],
+);
+
+export const deliveries = sqliteTable(
+  'deliveries',
+  {
+    id: text('id').primaryKey(),
+    runId: text('run_id')
+      .notNull()
+      .references(() => runs.id, { onDelete: 'cascade' }),
+    plexUserId: text('plex_user_id'),
+    email: text('email').notNull(),
+    name: text('name').notNull(),
+    /**
+     * pending → sending → sent | failed | unknown. 'unknown' = the process died mid-send over a
+     * provider without idempotency; never re-sent automatically.
+     */
+    status: text('status', { enum: ['pending', 'sending', 'sent', 'failed', 'unknown', 'skipped'] }).notNull(),
+    providerId: text('provider_id'),
+    error: text('error'),
+    attempts: integer('attempts').notNull().default(0),
+    sentAt: integer('sent_at'),
+    createdAt: integer('created_at').notNull(),
+  },
+  (t) => [
+    uniqueIndex('deliveries_run_email_idx').on(t.runId, t.email),
+    index('deliveries_status_idx').on(t.status),
+    index('deliveries_sent_idx').on(t.sentAt),
+  ],
+);
+
+/** Delivery webhooks from the email provider (bounces, complaints), deduplicated by provider event id. */
+export const providerEvents = sqliteTable('provider_events', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(),
+  email: text('email'),
+  providerId: text('provider_id'),
+  at: integer('at').notNull(),
+  payload: text('payload', { mode: 'json' }).$type<unknown>().notNull(),
+});

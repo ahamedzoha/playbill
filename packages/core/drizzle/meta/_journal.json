@@ -15,6 +15,13 @@
       "when": 1794377138636,
       "tag": "0001_people_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794381694360,
+      "tag": "0002_newsletters",
+      "breakpoints": true
     }
   ]
 }

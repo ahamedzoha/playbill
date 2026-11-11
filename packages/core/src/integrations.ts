@@ -1,4 +1,5 @@
 import { and, eq } from 'drizzle-orm';
+import { RadarrClient, SeerrClient, SonarrClient } from './clients/arr';
 import { TautulliClient } from './clients/tautulli';
 import { normalizeBaseUrl } from './clients/http';
 import { crypto } from './crypto';
@@ -85,4 +86,44 @@ export function tautulli(db: Db): TautulliClient | null {
   if (!row) return null;
   const { apiKey } = JSON.parse(crypto().decrypt(row.secret)) as IntegrationSecret;
   return new TautulliClient(row.baseUrl, apiKey);
+}
+
+function enabledOf(db: Db, kind: IntegrationKind) {
+  return db
+    .select()
+    .from(integrations)
+    .where(and(eq(integrations.kind, kind), eq(integrations.enabled, true)))
+    .all()
+    .map((row) => ({ row, apiKey: (JSON.parse(crypto().decrypt(row.secret)) as IntegrationSecret).apiKey }));
+}
+
+export function seerr(db: Db): SeerrClient | null {
+  const s = enabledOf(db, 'seerr')[0];
+  return s ? new SeerrClient(s.row.baseUrl, s.apiKey) : null;
+}
+
+export function sonarrs(db: Db): SonarrClient[] {
+  return enabledOf(db, 'sonarr').map((s) => new SonarrClient(s.row.baseUrl, s.apiKey));
+}
+
+export function radarrs(db: Db): RadarrClient[] {
+  return enabledOf(db, 'radarr').map((s) => new RadarrClient(s.row.baseUrl, s.apiKey));
+}
+
+/** Connects to a service with the given details and reports its version, or throws a readable error. */
+export async function testIntegration(kind: IntegrationKind, baseUrl: string, apiKey: string): Promise<string> {
+  switch (kind) {
+    case 'tautulli':
+      return `Tautulli ${(await new TautulliClient(baseUrl, apiKey).info()).version}`;
+    case 'seerr':
+      return `Seerr ${await new SeerrClient(baseUrl, apiKey).version()}`;
+    case 'sonarr':
+      return `Sonarr ${await new SonarrClient(baseUrl, apiKey).version()}`;
+    case 'radarr':
+      return `Radarr ${await new RadarrClient(baseUrl, apiKey).version()}`;
+  }
+}
+
+export function deleteIntegration(db: Db, id: string): void {
+  db.delete(integrations).where(eq(integrations.id, id)).run();
 }

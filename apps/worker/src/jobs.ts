@@ -1,12 +1,16 @@
 import { join } from 'node:path';
+import { eq } from 'drizzle-orm';
+import { type Campaign, advanceRun, campaignSettings } from '@playbill/core/campaigns';
+import { isDryRun, mailer } from '@playbill/core/mail';
+import { renderDigestEmail } from '@playbill/emails';
 import { config, logger } from '@playbill/core';
 import { pruneSessions } from '@playbill/core/auth';
 import { backupDatabase, dateLabel, pruneBackups } from '@playbill/core/backup';
 import { getFriends, getPendingInvites, getShares, inviteCoversServer } from '@playbill/core/clients/plextv';
 import { tautulliReader } from '@playbill/core/clients/tautulli';
 import { getSqlite, type Db } from '@playbill/core/db';
-import { libraries } from '@playbill/core/db/schema';
-import { tautulli } from '@playbill/core/integrations';
+import { campaigns, libraries, runs } from '@playbill/core/db/schema';
+import { radarrs, seerr, sonarrs, tautulli } from '@playbill/core/integrations';
 import { ownerCredentials } from '@playbill/core/owner';
 import type { Job, Queue } from '@playbill/core/queue';
 import { getSetting } from '@playbill/core/settings';
@@ -100,4 +104,52 @@ export const handlers: Record<string, Handler> = {
     }
     refreshLastPlayed(db);
   },
+};
+
+// ---------------------------------------------------------------------------------------------
+// Newsletters
+
+function renderContext(db: Db, campaign: Campaign) {
+  const s = campaignSettings(campaign);
+  const general = getSetting(db, 'general');
+  const publicUrl = general?.publicUrl ?? (isDryRun() ? 'http://localhost:3000' : null);
+  return {
+    publicUrl,
+    ctx: {
+      publicUrl: publicUrl ?? '',
+      serverName: getSetting(db, 'plex')?.name ?? 'Plex',
+      signature: s.signature,
+      subject: s.subject,
+      intro: s.intro,
+      tz: general?.timezone ?? process.env.TZ ?? 'UTC',
+      topic: campaign.topic,
+    },
+  };
+}
+
+handlers['campaign.run'] = async (payload, { db, queue, job }) => {
+  const runId = String(payload.runId);
+  const run = db.select().from(runs).where(eq(runs.id, runId)).get();
+  if (!run) return;
+  const campaign = db.select().from(campaigns).where(eq(campaigns.id, run.campaignId)).get();
+  if (!campaign) return;
+  const { publicUrl, ctx } = renderContext(db, campaign);
+  if (!publicUrl) {
+    db.update(runs).set({ status: 'deferred', note: 'Set the public URL in Settings so emails can link back and show images', updatedAt: Date.now() }).where(eq(runs.id, runId)).run();
+    queue.enqueue('campaign.run', { runId }, { runAt: Date.now() + 3_600_000, dedupeKey: `run:${runId}:${Date.now()}` });
+    return;
+  }
+  const client = tautulli(db);
+  const result = await advanceRun(db, runId, {
+    sources: { tautulli: client, seerr: seerr(db), sonarrs: sonarrs(db), radarrs: radarrs(db) },
+    mailer: mailer(db),
+    render: (content, r, id) => renderDigestEmail(content, ctx, r, id),
+    pauseMs: 600,
+    keepGoing: () => queue.extend(job),
+  });
+  log.info(`run ${runId}: ${result.status}`, { sent: result.sent, failed: result.failed });
+  if (result.status === 'deferred' || result.status === 'sending') {
+    const at = result.retryAt ?? Date.now() + 5_000;
+    queue.enqueue('campaign.run', { runId }, { runAt: at, dedupeKey: `run:${runId}:${at}` });
+  }
 };

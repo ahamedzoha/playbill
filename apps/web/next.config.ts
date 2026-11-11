@@ -5,7 +5,7 @@ const config: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.resolve(process.cwd(), '../..'),
   // @playbill/core ships TypeScript source.
-  transpilePackages: ['@playbill/core'],
+  transpilePackages: ['@playbill/core', '@playbill/emails'],
   serverExternalPackages: ['better-sqlite3'],
   poweredByHeader: false,
   devIndicators: false,
@@ -20,6 +20,8 @@ const config: NextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
         ],
       },
+      // The digest preview is shown in an iframe on the Newsletters page (same origin only).
+      { source: '/newsletters/preview', headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }] },
     ];
   },
 };

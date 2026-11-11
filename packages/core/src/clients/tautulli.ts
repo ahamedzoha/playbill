@@ -160,3 +160,31 @@ export function tautulliReader(client: TautulliClient): TautulliReader {
     },
   };
 }
+
+export const tautulliRecent = z
+  .object({
+    added_at: z.coerce.number(),
+    media_type: z.coerce.string(),
+    rating_key: z.coerce.string(),
+    parent_rating_key: str,
+    grandparent_rating_key: str,
+    title: z.coerce.string(),
+    parent_title: str,
+    grandparent_title: str,
+    year: num,
+    thumb: str,
+    parent_thumb: str,
+    grandparent_thumb: str,
+    section_id: str,
+    library_name: str,
+    media_index: num,
+    parent_media_index: num,
+  })
+  .loose();
+export type TautulliRecent = z.infer<typeof tautulliRecent>;
+
+/** Most recently added items across libraries, newest first (episodes, seasons, movies, albums). */
+export async function recentlyAdded(client: TautulliClient, count = 60): Promise<TautulliRecent[]> {
+  const data = await client.call('get_recently_added', { count }, z.object({ recently_added: z.array(tautulliRecent) }).loose());
+  return data.recently_added;
+}

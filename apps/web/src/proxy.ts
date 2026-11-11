@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const SESSION_COOKIE = 'playbill_session';
 
 /** Pages and APIs anyone may reach. Everything else needs a session (checked properly server-side). */
-const PUBLIC_PREFIXES = ['/login', '/setup', '/api/health', '/api/auth/', '/api/setup/code', '/api/hooks/', '/u/', '/v/', '/img/'];
+const PUBLIC_PREFIXES = ['/login', '/setup', '/api/health', '/api/auth/', '/api/setup/code', '/api/hooks/', '/api/unsubscribe/', '/u/', '/v/', '/img/'];
 
 /**
  * Optimistic check only: no cookie → off to sign in. Pages and route handlers still validate the

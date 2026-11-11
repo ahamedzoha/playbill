@@ -2,7 +2,10 @@ import { errorMessage, logger } from '@playbill/core';
 import type { Db } from '@playbill/core/db';
 import type { Queue } from '@playbill/core/queue';
 import { dueOccurrence, lastOccurrenceOf, markOccurrence } from '@playbill/core/schedule';
+import { createRun } from '@playbill/core/campaigns';
+import { campaigns } from '@playbill/core/db/schema';
 import { getSetting } from '@playbill/core/settings';
+import { eq } from 'drizzle-orm';
 import { isSetupComplete } from '@playbill/core/setup';
 
 const log = logger('scheduler');
@@ -57,9 +60,33 @@ export class Scheduler {
     }
   }
 
+  /** Enabled campaigns with a due occurrence get one run each (unique per occurrence). */
+  tickCampaigns(now = Date.now()): void {
+    if (!isSetupComplete(this.db)) return;
+    const tz = this.timezone();
+    for (const c of this.db.select().from(campaigns).where(eq(campaigns.enabled, true)).all()) {
+      try {
+        const due = dueOccurrence(c.cron, tz, c.lastOccurrence ?? c.updatedAt, now);
+        if (due.skipped > 0) log.warn(`campaign ${c.name}: skipped ${due.skipped} missed send(s)`);
+        if (due.occurrence === null) continue;
+        this.db.transaction(() => {
+          const run = createRun(this.db, c, 'schedule', new Date(due.occurrence!).toISOString(), now);
+          if (run) this.queue.enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
+          this.db.update(campaigns).set({ lastOccurrence: due.occurrence }).where(eq(campaigns.id, c.id)).run();
+        });
+      } catch (err) {
+        log.error(`campaign ${c.name} schedule failed`, { error: errorMessage(err) });
+      }
+    }
+  }
+
   start(): void {
     this.tick();
-    this.timer = setInterval(() => this.tick(), TICK_MS);
+    this.tickCampaigns();
+    this.timer = setInterval(() => {
+      this.tick();
+      this.tickCampaigns();
+    }, TICK_MS);
   }
 
   stop(): void {

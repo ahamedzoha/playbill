@@ -33,9 +33,23 @@ export const settingSchemas = {
    */
   setupCode: z.object({ code: z.string().min(8) }),
   general: z.object({
+    /** Where people reach Playbill from outside, e.g. https://playbill.example.com. Emails link and load images from it. */
     publicUrl: z.string().url().nullable(),
     timezone: z.string(),
     serverName: z.string(),
+  }),
+  /** How Playbill sends email. The secret (API key or SMTP password) is AES-GCM ciphertext. */
+  email: z.object({
+    provider: z.enum(['resend', 'smtp']),
+    fromName: z.string().min(1),
+    fromAddress: z.string().email(),
+    replyTo: z.string().email().nullable(),
+    smtp: z
+      .object({ host: z.string().min(1), port: z.number().int(), secure: z.boolean(), user: z.string().nullable() })
+      .nullable(),
+    secretEnc: z.string(),
+    /** Playbill's own sending limits; leave room for other apps on the same account. */
+    limits: z.object({ perDay: z.number().int().min(1), perMonth: z.number().int().min(1) }),
   }),
 } as const;
 

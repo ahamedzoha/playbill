@@ -14,6 +14,7 @@ await build({
   format: 'esm',
   sourcemap: 'linked',
   external: ['better-sqlite3'],
+  jsx: 'automatic',
   banner: {
     js: "import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);",
   },

@@ -13,6 +13,7 @@ import { ensureSetupCode, isSetupComplete } from '@playbill/core/setup';
 import { syncState } from '@playbill/core/db/schema';
 import { eq } from 'drizzle-orm';
 import { handlers } from './jobs';
+import { runCli } from './cli';
 import { Scheduler } from './scheduler';
 
 const log = logger('worker');
@@ -46,6 +47,10 @@ async function main(): Promise<void> {
   const cfg = config();
   await migrate();
   if (process.argv.includes('--migrate-only')) return;
+  if (process.argv[2] === 'config') {
+    await runCli(process.argv.slice(2));
+    return;
+  }
 
   const db = getDb();
   instanceClientId(db);
