@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from 'react';
 import { type FormState, addIntegration, removeIntegration, saveEmail, saveGeneral, saveLifecycle, sendTestEmail } from '@/app/settings/actions';
 
 const input = 'w-full rounded-lg border border-rule bg-paper/40 px-3 py-2 text-sm focus:border-blue focus:outline-none';
-const primary = 'rounded-lg bg-rail px-4 py-2 text-sm font-medium text-rail-ink transition-colors hover:bg-rail-active disabled:opacity-60';
+const primary = 'rounded-lg bg-action px-4 py-2 text-sm font-medium text-action-ink transition-colors hover:bg-action-hover disabled:opacity-60';
 const quiet = 'rounded-lg border border-rule bg-sheet px-4 py-2 text-sm font-medium hover:border-rule-strong disabled:opacity-60';
 
 function Note({ state }: { state: FormState | null }) {
@@ -71,7 +71,7 @@ export function EmailForm({ values }: { values: EmailValues }) {
       <fieldset className="flex flex-wrap gap-2">
         <legend className="mb-2 text-sm font-medium">Send with</legend>
         {(['resend', 'smtp'] as const).map((p) => (
-          <label key={p} className={`cursor-pointer rounded-lg border px-3 py-2 text-sm ${provider === p ? 'border-rail bg-rail text-rail-ink' : 'border-rule bg-sheet'}`}>
+          <label key={p} className={`cursor-pointer rounded-lg border px-3 py-2 text-sm ${provider === p ? 'border-action bg-action text-action-ink' : 'border-rule bg-sheet'}`}>
             <input type="radio" name="provider" value={p} checked={provider === p} onChange={() => setProvider(p)} className="sr-only" />
             {p === 'resend' ? 'Resend' : 'Any SMTP server'}
           </label>

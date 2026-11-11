@@ -14,6 +14,9 @@ colors:
   rail-ink-2: "#aebbd9"
   rail-hover: "#22376a"
   rail-active: "#2b4384"
+  action: "#1b2c57"
+  action-ink: "#eef2fb"
+  action-hover: "#2b4384"
   blue: "#256abf"
   blue-wash: "#eaf2fd"
   red: "#c4373a"
@@ -36,6 +39,9 @@ colors:
   dark-rail-ink-2: "#94a2c4"
   dark-rail-hover: "#16244a"
   dark-rail-active: "#1f3266"
+  dark-action: "#3a62b8"
+  dark-action-ink: "#f3f6fc"
+  dark-action-hover: "#4269bf"
   dark-blue: "#6da7ec"
   dark-blue-wash: "#152238"
   dark-red: "#ec7070"
@@ -126,14 +132,14 @@ components:
     rounded: "{rounded.sheet}"
     padding: "24px"
   button-primary:
-    backgroundColor: "{colors.rail}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.control}"
     padding: "8px 16px"
   button-primary-hover:
-    backgroundColor: "{colors.rail-active}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.action-hover}"
+    textColor: "{colors.action-ink}"
   link-action:
     textColor: "{colors.blue}"
     typography: "{typography.body-sm}"
@@ -153,8 +159,8 @@ components:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
   range-segment-active:
-    backgroundColor: "{colors.rail}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
   filter-chip:
     backgroundColor: "{colors.sheet}"
     textColor: "{colors.ink-2}"
@@ -162,8 +168,8 @@ components:
     rounded: "{rounded.pill}"
     padding: "6px 12px"
   filter-chip-active:
-    backgroundColor: "{colors.rail}"
-    textColor: "{colors.rail-ink}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
   input:
     backgroundColor: "{colors.sheet}"
     textColor: "{colors.ink}"
@@ -237,7 +243,8 @@ A cool, nearly monochrome blue world: paper-white sheets, slate inks, a navy rai
 - **Blue Wash** (`blue-wash`): the initials disc behind a person's avatar.
 
 ### Secondary
-- **Register-Cover Navy** (`rail`): the desktop side rail and phone top bar, and reused as the solid fill for the one primary action per form and for selected states (active range segment, active filter chip). `rail-hover` and `rail-active` are its two raised steps; `rail-ink` and `rail-ink-2` are its primary and muted text.
+- **Register-Cover Navy** (`rail`): the desktop side rail and phone top bar. `rail-hover` and `rail-active` are its two raised steps; `rail-ink` and `rail-ink-2` are its primary and muted text.
+- **Action** (`action`): the solid fill for the one primary action per form and for selected states (active range segment, active filter chip, active tab, the chosen email provider); `action-hover` on hover, `action-ink` its text. In light mode it is the rail navy. In dark mode it is a brighter blue (`dark-action`), because the dark rail navy sits too close to the dark sheet to read as a button; white on it keeps about 5:1.
 
 ### Tertiary
 - **Decision Red** (`red`): ink for what needs the owner: the filled square and action link of a Housekeeping item that is a decision, a connection that is down in Settings, and a save or sign-in that failed. `red-wash` is its quiet ground.

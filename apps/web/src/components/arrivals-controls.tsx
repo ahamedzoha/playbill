@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from 'react';
 import { type FormState, saveArrivals, sendArrivalsTest, setArrivalsState } from '@/app/newsletters/actions';
 
 const btn = 'rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60';
-const primary = `${btn} bg-rail text-rail-ink hover:bg-rail-active`;
+const primary = `${btn} bg-action text-action-ink hover:bg-action-hover`;
 const quiet = `${btn} border border-rule bg-sheet text-ink hover:border-rule-strong`;
 const input = 'w-full rounded-lg border border-rule bg-paper/40 px-3 py-2 text-sm focus:border-blue focus:outline-none';
 
@@ -81,10 +81,11 @@ export function ArrivalsControls({ v, wanting, emailReady }: { v: ArrivalsValues
         <Note state={note} />
       </div>
 
-      <form action={action} className="space-y-4 border-t border-rule pt-5">
-        <div className="grid gap-4 sm:grid-cols-4">
-          <label className="block space-y-1.5">
-            <span className="text-sm font-medium">Wait after the last arrival</span>
+      <form action={action} className="@container space-y-4 border-t border-rule pt-5">
+        {/* Columns follow the form's own width: the page puts a preview panel beside it on wide screens. */}
+        <div className="grid grid-cols-2 items-end gap-4 @2xl:grid-cols-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium">Wait after an arrival</span>
             <select name="debounceHours" defaultValue={v.debounceHours} className={input}>
               {[1, 2, 3, 6].map((h) => (
                 <option key={h} value={h}>
@@ -93,7 +94,7 @@ export function ArrivalsControls({ v, wanting, emailReady }: { v: ArrivalsValues
               ))}
             </select>
           </label>
-          <label className="block space-y-1.5">
+          <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium">But never longer than</span>
             <select name="maxWaitHours" defaultValue={v.maxWaitHours} className={input}>
               {[6, 12, 24, 48].map((h) => (
@@ -103,7 +104,7 @@ export function ArrivalsControls({ v, wanting, emailReady }: { v: ArrivalsValues
               ))}
             </select>
           </label>
-          <label className="block space-y-1.5">
+          <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium">Quiet from</span>
             <select name="quietStart" defaultValue={v.quietStart} className={input}>
               {Array.from({ length: 24 }, (_, h) => (
@@ -113,7 +114,7 @@ export function ArrivalsControls({ v, wanting, emailReady }: { v: ArrivalsValues
               ))}
             </select>
           </label>
-          <label className="block space-y-1.5">
+          <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium">Until</span>
             <select name="quietEnd" defaultValue={v.quietEnd} className={input}>
               {Array.from({ length: 24 }, (_, h) => (

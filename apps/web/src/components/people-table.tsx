@@ -114,12 +114,12 @@ export function PeopleTable({ rows, now, tz, initialStatus }: { rows: Row[]; now
                 onClick={() => choose(f.id)}
                 aria-pressed={active}
                 className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                  active ? 'border-rail bg-rail text-rail-ink' : 'border-rule bg-sheet text-ink-2 hover:border-rule-strong hover:text-ink'
+                  active ? 'border-action bg-action text-action-ink' : 'border-rule bg-sheet text-ink-2 hover:border-rule-strong hover:text-ink'
                 }`}
               >
                 {f.segments?.length === 1 && <StatusMark segment={f.segments[0]!} size={10} />}
                 {f.label}
-                <span className={`num ${active ? 'text-rail-ink-2' : 'text-ink-3'}`}>{n}</span>
+                <span className={`num ${active ? 'text-action-ink/75' : 'text-ink-3'}`}>{n}</span>
               </button>
             );
           })}

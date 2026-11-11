@@ -30,7 +30,7 @@ export function PersonForm({ id, note, exempt, name }: { id: string; note: strin
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-rail px-4 py-2 text-sm font-medium text-rail-ink transition-colors hover:bg-rail-active disabled:opacity-60"
+          className="rounded-lg bg-action px-4 py-2 text-sm font-medium text-action-ink transition-colors hover:bg-action-hover disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save'}
         </button>

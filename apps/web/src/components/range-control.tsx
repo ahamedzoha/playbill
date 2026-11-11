@@ -21,7 +21,7 @@ export function RangeControl({ value, basePath }: { value: RangeDays; basePath: 
             aria-current={active ? 'true' : undefined}
             scroll={false}
             className={`num rounded-md px-3 py-1.5 text-sm transition-colors ${
-              active ? 'bg-rail text-rail-ink' : 'text-ink-2 hover:bg-paper hover:text-ink'
+              active ? 'bg-action text-action-ink' : 'text-ink-2 hover:bg-paper hover:text-ink'
             }`}
           >
             {r} days

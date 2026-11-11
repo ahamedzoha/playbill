@@ -23,6 +23,10 @@
   --rail-ink-2: #aebbd9;
   --rail-hover: #22376a;
   --rail-active: #2b4384;
+  /* Buttons and selected controls. Same navy as the rail in light; a brighter blue in dark, where the rail navy disappears into the sheet. */
+  --action: #1b2c57;
+  --action-ink: #eef2fb;
+  --action-hover: #2b4384;
   --blue: #256abf;
   --blue-wash: #eaf2fd;
   --red: #c4373a;
@@ -52,6 +56,9 @@
     --rail-ink-2: #94a2c4;
     --rail-hover: #16244a;
     --rail-active: #1f3266;
+    --action: #3a62b8;
+    --action-ink: #f3f6fc;
+    --action-hover: #4269bf;
     --blue: #6da7ec;
     --blue-wash: #152238;
     --red: #ec7070;
@@ -81,6 +88,9 @@
   --rail-ink-2: #94a2c4;
   --rail-hover: #16244a;
   --rail-active: #1f3266;
+  --action: #3a62b8;
+  --action-ink: #f3f6fc;
+  --action-hover: #4269bf;
   --blue: #6da7ec;
   --blue-wash: #152238;
   --red: #ec7070;
@@ -108,6 +118,9 @@
   --color-rail-ink-2: var(--rail-ink-2);
   --color-rail-hover: var(--rail-hover);
   --color-rail-active: var(--rail-active);
+  --color-action: var(--action);
+  --color-action-ink: var(--action-ink);
+  --color-action-hover: var(--action-hover);
   --color-blue: var(--blue);
   --color-blue-wash: var(--blue-wash);
   --color-red: var(--red);

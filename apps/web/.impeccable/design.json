@@ -709,6 +709,57 @@
           "#9ec5f4"
         ],
         "note": "Ordinal register ramp; validated with the dataviz validator against #151a22."
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Action",
+        "canonical": "#1b2c57",
+        "oklch": "oklch(30.4% 0.083 266.6)",
+        "tonalRamp": [
+          "#010133",
+          "#0c1d5a",
+          "#263d7d",
+          "#435ea1",
+          "#6380c6",
+          "#84a3ec",
+          "#a8c8ff",
+          "#d0eeff"
+        ],
+        "dark": "#3a62b8"
+      },
+      "action-hover": {
+        "role": "primary",
+        "displayName": "Action Hover",
+        "canonical": "#2b4384",
+        "oklch": "oklch(40.0% 0.113 266.2)",
+        "tonalRamp": [
+          "#010133",
+          "#0c1d5a",
+          "#263d7d",
+          "#435ea1",
+          "#6380c6",
+          "#84a3ec",
+          "#a8c8ff",
+          "#d0eeff"
+        ],
+        "dark": "#4269bf"
+      },
+      "action-ink": {
+        "role": "primary",
+        "displayName": "Action Ink",
+        "canonical": "#eef2fb",
+        "oklch": "oklch(96.2% 0.011 268.5)",
+        "tonalRamp": [
+          "#010133",
+          "#0c1d5a",
+          "#263d7d",
+          "#435ea1",
+          "#6380c6",
+          "#84a3ec",
+          "#a8c8ff",
+          "#d0eeff"
+        ],
+        "dark": "#f3f6fc"
       }
     },
     "typographyMeta": {
@@ -868,7 +919,7 @@
       "kind": "custom",
       "refersTo": "register-mark",
       "description": "Signature: one rounded-square mark per week on the shared ink ramp, with an open slot before joining and a hover readout.",
-      "html": "<div class=\"ds-strip\" tabindex=\"0\" aria-label=\"Watched in 9 of the last 12 weeks\"><span class=\"ds-mark ds-slot\" style=\"--i:0\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:1\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:2\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:3\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:4\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:5\"></span><span class=\"ds-mark\" style=\"background:var(--mark-4);--i:6\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:7\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:8\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:9\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:10\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:11\"></span><div class=\"ds-tip\" role=\"tooltip\"><p class=\"ds-tip-d\">3 Nov – 9 Nov</p><p class=\"ds-tip-v\">7 plays · 5.5 h</p><p class=\"ds-tip-x\">Mostly Severance</p></div></div>",
+      "html": "<div class=\"ds-strip\" tabindex=\"0\" aria-label=\"Watched in 9 of the last 12 weeks\"><span class=\"ds-mark ds-slot\" style=\"--i:0\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:1\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:2\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:3\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:4\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:5\"></span><span class=\"ds-mark\" style=\"background:var(--mark-4);--i:6\"></span><span class=\"ds-mark\" style=\"background:var(--mark-3);--i:7\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:8\"></span><span class=\"ds-mark\" style=\"background:var(--mark-1);--i:9\"></span><span class=\"ds-mark\" style=\"background:var(--mark-0);--i:10\"></span><span class=\"ds-mark\" style=\"background:var(--mark-2);--i:11\"></span><div class=\"ds-tip\" role=\"tooltip\"><p class=\"ds-tip-d\">3 Nov \u2013 9 Nov</p><p class=\"ds-tip-v\">7 plays \u00b7 5.5 h</p><p class=\"ds-tip-x\">Mostly Severance</p></div></div>",
       "css": ":host{--paper:#f3f5f9;--sheet:#fff;--ink:#14171f;--ink-2:#4b5263;--ink-3:#626a7b;--rule:#e2e6ee;--rule-strong:#c9d0dc;--rail:#1b2c57;--rail-ink:#eef2fb;--rail-ink-2:#aebbd9;--rail-hover:#22376a;--rail-active:#2b4384;--blue:#256abf;--blue-wash:#eaf2fd;--red:#c4373a;--mark-0:#e6eaf1;--slot-line:#b9c1cf;--mark-1:#86b6ef;--mark-2:#3987e5;--mark-3:#1c5cab;--mark-4:#0d366b;}@keyframes ds-ink{from{opacity:.45;transform:scale(.55)}to{opacity:1;transform:scale(1)}}.ds-strip{position:relative;display:inline-flex;gap:3px;margin-top:84px;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;border-radius:4px}.ds-strip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ds-mark{display:block;width:13px;height:13px;border-radius:3px;animation:ds-ink 420ms cubic-bezier(.16,1,.3,1) both}.ds-mark:nth-child(n){animation-delay:calc(var(--i,0)*18ms)}.ds-mark:hover{outline:2px solid var(--ink);outline-offset:1px}.ds-slot{background:transparent;box-shadow:inset 0 0 0 1px var(--slot-line)}.ds-tip{position:absolute;bottom:100%;left:60%;transform:translateX(-50%);margin-bottom:8px;width:max-content;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;font-size:.875rem;box-shadow:0 1px 2px rgb(20 23 31 / .04),0 6px 18px -8px rgb(20 23 31 / .12)}.ds-tip p{margin:0}.ds-tip-d{font-family:'Barlow Condensed','Hanken Grotesk',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.8125rem;line-height:1;color:var(--ink-3)}.ds-tip-v{margin-top:4px!important;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}.ds-tip-x{color:var(--ink-2)}@media (prefers-reduced-motion:reduce){.ds-mark{animation:none}}"
     },
     {

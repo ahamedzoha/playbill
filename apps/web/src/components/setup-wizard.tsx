@@ -23,7 +23,7 @@ async function post(url: string, body: unknown): Promise<{ ok: boolean; data: Re
 const input =
   'w-full rounded-md border border-rule bg-sheet px-3 py-2 outline-none focus:border-blue focus:outline-none';
 const primary =
-  'rounded-md bg-rail px-4 py-2.5 font-medium text-rail-ink transition-colors hover:bg-rail-active disabled:opacity-60';
+  'rounded-md bg-action px-4 py-2.5 font-medium text-action-ink transition-colors hover:bg-action-hover disabled:opacity-60';
 
 function Section({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (

@@ -41,7 +41,7 @@ export function PreferencesForm({
               const box = e.currentTarget.form?.elements.namedItem(`topic:${focus.id}`) as HTMLInputElement | null;
               if (box) box.checked = false;
             }}
-            className="mt-4 rounded-lg bg-rail px-4 py-2.5 text-sm font-medium text-rail-ink hover:bg-rail-active disabled:opacity-60"
+            className="mt-4 rounded-lg bg-action px-4 py-2.5 text-sm font-medium text-action-ink hover:bg-action-hover disabled:opacity-60"
             disabled={pending}
           >
             Yes, stop the {focus.label.toLowerCase()}
@@ -72,7 +72,7 @@ export function PreferencesForm({
           name="action"
           value="save"
           disabled={pending}
-          className="rounded-lg bg-rail px-4 py-2.5 text-sm font-medium text-rail-ink hover:bg-rail-active disabled:opacity-60"
+          className="rounded-lg bg-action px-4 py-2.5 text-sm font-medium text-action-ink hover:bg-action-hover disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save my choices'}
         </button>

@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from 'react';
 import { type FormState, saveDigest, sendDigestNow, setDigestState } from '@/app/newsletters/actions';
 
 const btn = 'rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60';
-const primary = `${btn} bg-rail text-rail-ink hover:bg-rail-active`;
+const primary = `${btn} bg-action text-action-ink hover:bg-action-hover`;
 const quiet = `${btn} border border-rule bg-sheet text-ink hover:border-rule-strong`;
 const input = 'w-full rounded-lg border border-rule bg-paper/40 px-3 py-2 text-sm focus:border-blue focus:outline-none';
 

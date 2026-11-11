@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { type FormState, sendRecapTest, setRecapState } from '@/app/newsletters/actions';
 
 const btn = 'rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60';
-const primary = `${btn} bg-rail text-rail-ink hover:bg-rail-active`;
+const primary = `${btn} bg-action text-action-ink hover:bg-action-hover`;
 const quiet = `${btn} border border-rule bg-sheet text-ink hover:border-rule-strong`;
 
 export function RecapControls({ enabled, mode, emailReady }: { enabled: boolean; mode: 'test' | 'live'; emailReady: boolean }) {

@@ -49,7 +49,7 @@ export function CandidateTable({ never, stale, defaultDate }: { never: Cand[]; s
               aria-selected={tab === t}
               type="button"
               onClick={() => setTab(t)}
-              className={`rounded-md px-3 py-1.5 text-sm ${tab === t ? 'bg-rail text-rail-ink' : 'text-ink-2 hover:text-ink'}`}
+              className={`rounded-md px-3 py-1.5 text-sm ${tab === t ? 'bg-action text-action-ink' : 'text-ink-2 hover:text-ink'}`}
             >
               {t === 'never' ? 'Never watched' : 'Not watched in a year'} <span className="num opacity-70">{t === 'never' ? never.length : stale.length}</span>
             </button>
@@ -110,7 +110,7 @@ export function CandidateTable({ never, stale, defaultDate }: { never: Cand[]; s
             {[3, 7, 14].map((d) => <option key={d} value={d}>{d} days before</option>)}
           </select>
         </label>
-        <button type="button" disabled={pending || picked.size === 0} className={`${btn} bg-rail text-rail-ink hover:bg-rail-active`} onClick={() => start(async () => {
+        <button type="button" disabled={pending || picked.size === 0} className={`${btn} bg-action text-action-ink hover:bg-action-hover`} onClick={() => start(async () => {
           const r = await planRemoval([...picked], date, days);
           setState(r);
           if (r.ok) setPicked(new Set());
