@@ -284,7 +284,7 @@ export const suppressions = sqliteTable('suppressions', {
 
 export const campaigns = sqliteTable('campaigns', {
   id: text('id').primaryKey(),
-  kind: text('kind', { enum: ['digest'] }).notNull(),
+  kind: text('kind', { enum: ['digest', 'arrivals'] }).notNull(),
   name: text('name').notNull(),
   topic: text('topic').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
@@ -340,6 +340,8 @@ export const deliveries = sqliteTable(
     error: text('error'),
     attempts: integer('attempts').notNull().default(0),
     sentAt: integer('sent_at'),
+    /** For personal emails (arrivals): which of the run's items this person gets. */
+    items: text('items', { mode: 'json' }).$type<string[]>(),
     createdAt: integer('created_at').notNull(),
   },
   (t) => [
@@ -358,3 +360,31 @@ export const providerEvents = sqliteTable('provider_events', {
   at: integer('at').notNull(),
   payload: text('payload', { mode: 'json' }).$type<unknown>().notNull(),
 });
+
+/**
+ * Everything Playbill has seen arrive in Plex, one row per Plex item (film, episode, season, show).
+ * Recorded once, so a quality upgrade or a re-scan never alerts twice. `alertRunId` is set when the
+ * item was included in an arrivals email run (or marked as backlog on first sync).
+ */
+export const arrivals = sqliteTable(
+  'arrivals',
+  {
+    ratingKey: text('rating_key').primaryKey(),
+    kind: text('kind', { enum: ['movie', 'episode', 'season', 'show'] }).notNull(),
+    /** Plex key of the show for episodes/seasons; the item itself for films and shows. */
+    groupKey: text('group_key').notNull(),
+    title: text('title').notNull(),
+    groupTitle: text('group_title').notNull(),
+    season: integer('season'),
+    episode: integer('episode'),
+    year: integer('year'),
+    image: text('image', { mode: 'json' }).$type<Record<string, unknown>>(),
+    library: text('library'),
+    addedAt: integer('added_at').notNull(),
+    seenAt: integer('seen_at').notNull(),
+    /** Plex ids of people who requested it in Seerr (they already got Seerr's email). */
+    requestedBy: text('requested_by', { mode: 'json' }).$type<string[]>(),
+    alertRunId: text('alert_run_id'),
+  },
+  (t) => [index('arrivals_pending_idx').on(t.alertRunId), index('arrivals_group_idx').on(t.groupKey)],
+);

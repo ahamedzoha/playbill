@@ -153,7 +153,8 @@ function lastSentWindowEnd(db: Db, campaignId: string, excludeRunId: string): nu
 export interface RunDeps {
   sources: DigestSources;
   mailer: MailProvider | null;
-  render: (content: DigestContent, recipient: Recipient, deliveryId: string) => Promise<OutgoingEmail>;
+  /** `items` is the delivery's personal subset (arrivals); null for emails everyone gets the same. */
+  render: (content: DigestContent, recipient: Recipient, deliveryId: string, items: string[] | null, campaign: Campaign) => Promise<OutgoingEmail>;
   now?: () => number;
   /** Pause between sends, to stay well under provider rate limits. */
   pauseMs?: number;
@@ -185,11 +186,12 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
   if (!run) throw new Error(`run ${runId} not found`);
   const campaign = db.select().from(campaigns).where(eq(campaigns.id, run.campaignId)).get();
   if (!campaign) throw new Error(`campaign for run ${runId} not found`);
-  const settings = campaignSettings(campaign);
+  const isDigest = campaign.kind === 'digest';
 
   if (run.status === 'done' || run.status === 'skipped' || run.status === 'failed') return { status: run.status, sent: 0, failed: 0 };
 
-  if (run.status === 'planned') {
+  if (run.status === 'planned' && isDigest) {
+    const settings = campaignSettings(campaign);
     const until = now();
     const since = lastSentWindowEnd(db, campaign.id, run.id) ?? until - 7 * DAY;
     const content = await buildDigest(db, deps.sources, settings, Math.max(since, until - 14 * DAY), until);
@@ -207,11 +209,13 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
   }
 
   if (run.status === 'frozen' || run.status === 'deferred') {
-    const recipients =
-      run.trigger === 'test' || campaign.mode === 'test'
-        ? testAudience(db, settings.testAddresses)
-        : digestAudience(db, campaign.topic as TopicId).recipients;
     const t = now();
+    // Arrivals runs are planned with their deliveries already in place (each person's own items).
+    const recipients = !isDigest
+      ? []
+      : run.trigger === 'test' || campaign.mode === 'test'
+        ? testAudience(db, campaignSettings(campaign).testAddresses)
+        : digestAudience(db, campaign.topic as TopicId).recipients;
     db.transaction((tx) => {
       for (const r of recipients) {
         tx.insert(deliveries)
@@ -224,6 +228,15 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
     const pending = db.select({ n: sql<number>`count(*)` }).from(deliveries).where(and(eq(deliveries.runId, run.id), eq(deliveries.status, 'pending'))).get()?.n ?? 0;
     const quota = quotaState(db, t);
     if (pending > quota.remaining) {
+      if (!isDigest) {
+        // Alerts are only early news: when the allowance is short, drop them; the weekly digest covers them.
+        db.update(deliveries)
+          .set({ status: 'skipped', error: 'Over the sending allowance; the weekly digest will include it' })
+          .where(and(eq(deliveries.runId, run.id), eq(deliveries.status, 'pending')))
+          .run();
+        setRun(db, run.id, { status: 'skipped', note: `Not sent: ${pending} emails needed, ${quota.remaining} left in the allowance` });
+        return { status: 'skipped', sent: 0, failed: 0 };
+      }
       setRun(db, run.id, { status: 'deferred', note: `Waiting for sending allowance: ${pending} to send, ${quota.remaining} left today` });
       return { status: 'deferred', sent: 0, failed: 0, retryAt: t + 3_600_000 };
     }
@@ -250,7 +263,7 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
     }
     db.update(deliveries).set({ status: 'sending', attempts: d.attempts + 1 }).where(eq(deliveries.id, d.id)).run();
     try {
-      const email = await deps.render(content, { plexUserId: d.plexUserId, email: d.email, name: d.name }, d.id);
+      const email = await deps.render(content, { plexUserId: d.plexUserId, email: d.email, name: d.name }, d.id, d.items ?? null, campaign);
       const res = await deps.mailer.send(email);
       db.update(deliveries).set({ status: 'sent', providerId: res.id, sentAt: now(), error: null }).where(eq(deliveries.id, d.id)).run();
       sent++;

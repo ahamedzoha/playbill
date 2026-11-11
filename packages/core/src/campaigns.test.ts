@@ -63,7 +63,7 @@ function fakeMailer(opts: { idempotent?: boolean; failOn?: (to: string, n: numbe
   };
 }
 
-const render = async (_c: unknown, r: { email: string; name: string }, id: string) => ({
+const render = async (_c: unknown, r: { email: string; name: string }, id: string, _items?: unknown, _cmp?: unknown) => ({
   to: r.email,
   toName: r.name,
   subject: 's',

@@ -1,15 +1,16 @@
 import { join } from 'node:path';
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import { type Campaign, advanceRun, campaignSettings } from '@playbill/core/campaigns';
 import { isDryRun, mailer } from '@playbill/core/mail';
-import { renderDigestEmail } from '@playbill/emails';
+import { renderArrivalsEmail, renderDigestEmail } from '@playbill/emails';
+import { arrivalsSettings, dueArrivals, ensureArrivalsCampaign, planArrivals, reconcileArrivals, type ArrivalsContent } from '@playbill/core/arrivals';
 import { config, logger } from '@playbill/core';
 import { pruneSessions } from '@playbill/core/auth';
 import { backupDatabase, dateLabel, pruneBackups } from '@playbill/core/backup';
 import { getFriends, getPendingInvites, getShares, inviteCoversServer } from '@playbill/core/clients/plextv';
 import { tautulliReader } from '@playbill/core/clients/tautulli';
 import { getSqlite, type Db } from '@playbill/core/db';
-import { campaigns, libraries, runs } from '@playbill/core/db/schema';
+import { arrivals, campaigns, libraries, runs } from '@playbill/core/db/schema';
 import { radarrs, seerr, sonarrs, tautulli } from '@playbill/core/integrations';
 import { ownerCredentials } from '@playbill/core/owner';
 import type { Job, Queue } from '@playbill/core/queue';
@@ -110,7 +111,7 @@ export const handlers: Record<string, Handler> = {
 // Newsletters
 
 function renderContext(db: Db, campaign: Campaign) {
-  const s = campaignSettings(campaign);
+  const s = campaign.kind === 'digest' ? campaignSettings(campaign) : { ...arrivalsSettings.parse(campaign.settings), subject: '', intro: '' };
   const general = getSetting(db, 'general');
   const publicUrl = general?.publicUrl ?? (isDryRun() ? 'http://localhost:3000' : null);
   return {
@@ -143,7 +144,10 @@ handlers['campaign.run'] = async (payload, { db, queue, job }) => {
   const result = await advanceRun(db, runId, {
     sources: { tautulli: client, seerr: seerr(db), sonarrs: sonarrs(db), radarrs: radarrs(db) },
     mailer: mailer(db),
-    render: (content, r, id) => renderDigestEmail(content, ctx, r, id),
+    render: (content, r, id, items, c) =>
+      c.kind === 'arrivals'
+        ? renderArrivalsEmail(content as unknown as ArrivalsContent, ctx, r, id, items)
+        : renderDigestEmail(content, ctx, r, id),
     pauseMs: 600,
     keepGoing: () => queue.extend(job),
   });
@@ -151,5 +155,29 @@ handlers['campaign.run'] = async (payload, { db, queue, job }) => {
   if (result.status === 'deferred' || result.status === 'sending') {
     const at = result.retryAt ?? Date.now() + 5_000;
     queue.enqueue('campaign.run', { runId }, { runAt: at, dedupeKey: `run:${runId}:${at}` });
+  }
+};
+
+/**
+ * Every 15 minutes: record new arrivals, and when a batch is due (and alerts are on), plan and send it.
+ * While alerts are off, new arrivals are marked as passed, so switching them on never floods anyone.
+ */
+handlers['arrivals.check'] = async (_payload, { db, queue }) => {
+  const client = tautulli(db);
+  if (!client) return;
+  const campaign = ensureArrivalsCampaign(db);
+  const r = await reconcileArrivals(db, client, seerr(db));
+  if (r.added) log.info('new arrivals recorded', { added: r.added, backlog: r.backlog });
+  if (!campaign.enabled) {
+    db.update(arrivals).set({ alertRunId: 'paused' }).where(isNull(arrivals.alertRunId)).run();
+    return;
+  }
+  const tz = getSetting(db, 'general')?.timezone ?? process.env.TZ ?? 'UTC';
+  const pending = dueArrivals(db, arrivalsSettings.parse(campaign.settings), tz);
+  if (!pending) return;
+  const plan = planArrivals(db, campaign, pending);
+  if (plan && plan.recipients > 0) {
+    log.info('arrivals run planned', { ...plan });
+    queue.enqueue('campaign.run', { runId: plan.runId }, { dedupeKey: `run:${plan.runId}` });
   }
 };

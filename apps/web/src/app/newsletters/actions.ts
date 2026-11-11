@@ -94,3 +94,64 @@ export async function sendDigestNow(kind: 'test' | 'live'): Promise<FormState> {
     return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
 }
+
+// ---------------------------------------------------------------------------------------------
+// New arrivals
+
+import { arrivalsSettings, ensureArrivalsCampaign, planTestArrivals } from '@playbill/core/arrivals';
+
+export async function setArrivalsState(input: { enabled?: boolean; mode?: 'test' | 'live' }): Promise<FormState> {
+  try {
+    const o = await owner();
+    const d = db();
+    const c = ensureArrivalsCampaign(d);
+    d.update(campaigns).set({ ...input, updatedAt: Date.now() }).where(eq(campaigns.id, c.id)).run();
+    audit(d, { actor: o.username, action: 'arrivals.state', target: c.id, before: { enabled: c.enabled, mode: c.mode }, after: input });
+    revalidatePath('/newsletters');
+    return { ok: true, message: 'Saved' };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+export async function saveArrivals(_prev: FormState | null, form: FormData): Promise<FormState> {
+  try {
+    const o = await owner();
+    const d = db();
+    const c = ensureArrivalsCampaign(d);
+    const cur = arrivalsSettings.parse(c.settings);
+    const parsed = arrivalsSettings.safeParse({
+      ...cur,
+      debounceMinutes: Number(form.get('debounceHours') ?? 2) * 60,
+      maxWaitHours: Number(form.get('maxWaitHours') ?? 24),
+      quietStart: Number(form.get('quietStart') ?? 22),
+      quietEnd: Number(form.get('quietEnd') ?? 9),
+      testAddresses: String(form.get('testAddresses') ?? '')
+        .split(/[\s,;]+/)
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
+    if (!parsed.success) return { ok: false, message: 'Check the numbers and the test addresses.' };
+    d.update(campaigns).set({ settings: parsed.data, updatedAt: Date.now() }).where(eq(campaigns.id, c.id)).run();
+    audit(d, { actor: o.username, action: 'arrivals.settings', target: c.id, before: cur, after: parsed.data });
+    revalidatePath('/newsletters');
+    return { ok: true, message: 'Saved' };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+export async function sendArrivalsTest(): Promise<FormState> {
+  try {
+    const o = await owner();
+    const d = db();
+    const plan = planTestArrivals(d, ensureArrivalsCampaign(d));
+    if (!plan) return { ok: false, message: 'Nothing arrived in the past week to put in a test, or there are no test addresses.' };
+    new Queue(d).enqueue('campaign.run', { runId: plan.runId }, { dedupeKey: `run:${plan.runId}` });
+    audit(d, { actor: o.username, action: 'arrivals.send.test', target: plan.runId });
+    revalidatePath('/newsletters');
+    return { ok: true, message: `Test with ${plan.items} ${plan.items === 1 ? 'title' : 'titles'} on its way.` };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}

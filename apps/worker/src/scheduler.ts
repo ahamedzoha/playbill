@@ -24,6 +24,7 @@ const BUILT_IN: BuiltIn[] = [
   { name: 'maintenance', cron: '15 4 * * *', job: 'maintenance' },
   { name: 'sync.people', cron: '7 */6 * * *', job: 'sync.people', needsSetup: true },
   { name: 'sync.history', cron: '*/15 * * * *', job: 'sync.history', needsSetup: true },
+  { name: 'arrivals.check', cron: '5,20,35,50 * * * *', job: 'arrivals.check', needsSetup: true },
 ];
 
 export const TICK_MS = 30_000;
@@ -64,7 +65,7 @@ export class Scheduler {
   tickCampaigns(now = Date.now()): void {
     if (!isSetupComplete(this.db)) return;
     const tz = this.timezone();
-    for (const c of this.db.select().from(campaigns).where(eq(campaigns.enabled, true)).all()) {
+    for (const c of this.db.select().from(campaigns).where(eq(campaigns.enabled, true)).all().filter((x) => x.kind === 'digest')) {
       try {
         const due = dueOccurrence(c.cron, tz, c.lastOccurrence ?? c.updatedAt, now);
         if (due.skipped > 0) log.warn(`campaign ${c.name}: skipped ${due.skipped} missed send(s)`);

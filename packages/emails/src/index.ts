@@ -66,3 +66,50 @@ export async function renderDigestEmail(content: DigestContent, ctx: DigestRende
     idempotencyKey: deliveryId,
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// New arrivals
+
+import type { ArrivalsContent } from '@playbill/core/arrivals';
+import { ArrivalsEmail, arrivalsSubject } from './arrivals';
+
+export { ArrivalsEmail, arrivalsSubject };
+
+export interface ArrivalsRenderContext {
+  publicUrl: string;
+  serverName: string;
+  signature: string;
+}
+
+/** One person's arrivals email: only the items planned for them, with one-click unsubscribe. */
+export async function renderArrivalsEmail(content: ArrivalsContent, ctx: ArrivalsRenderContext, r: Recipient, deliveryId: string, itemKeys: string[] | null): Promise<OutgoingEmail> {
+  const items = itemKeys ? content.items.filter((i) => itemKeys.includes(i.key)) : content.items;
+  if (items.length === 0) throw new Error('No items for this person');
+  const token = preferenceToken(r.plexUserId ?? 'test');
+  const links = {
+    preferences: joinUrl(ctx.publicUrl, `/u/${token}`),
+    unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=arrivals`),
+    plex: 'https://app.plex.tv/desktop',
+  };
+  const el = createElement(ArrivalsEmail, {
+    items,
+    recipientName: r.name,
+    serverName: ctx.serverName,
+    signature: ctx.signature,
+    image: (ref) => joinUrl(ctx.publicUrl, `/img/${imageToken(ref)}`),
+    links,
+  });
+  const [html, text] = await Promise.all([render(el), render(el, { plainText: true })]);
+  return {
+    to: r.email,
+    toName: r.name,
+    subject: arrivalsSubject(items),
+    html,
+    text,
+    headers: {
+      'List-Unsubscribe': `<${joinUrl(ctx.publicUrl, `/api/unsubscribe/${token}?topic=arrivals`)}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
+    idempotencyKey: deliveryId,
+  };
+}
