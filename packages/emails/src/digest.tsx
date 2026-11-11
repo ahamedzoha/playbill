@@ -68,10 +68,18 @@ function Heading2({ children }: { children: string }) {
   );
 }
 
-function Poster({ item, image, width }: { item: DigestItem; image: DigestEmailProps['image']; width: number }) {
+/**
+ * `fluid` posters shrink to their column on phones (a third of a ~300px screen is far less than
+ * 160px) and stop at `width` on desktop. The width/height attributes stay for Outlook, which
+ * ignores max-width and sizes images from them.
+ */
+function Poster({ item, image, width, fluid = false }: { item: DigestItem; image: DigestEmailProps['image']; width: number; fluid?: boolean }) {
   const h = Math.round(width * 1.5);
+  const size = fluid ? { width: '100%', maxWidth: `${width}px`, height: 'auto' } : {};
   return item.image ? (
-    <Img src={image(item.image)} width={width} height={h} alt="" style={{ display: 'block', borderRadius: '6px', backgroundColor: C.rule, objectFit: 'cover' }} />
+    <Img src={image(item.image)} width={width} height={h} alt="" style={{ display: 'block', borderRadius: '6px', backgroundColor: C.rule, objectFit: 'cover', ...size }} />
+  ) : fluid ? (
+    <div style={{ width: '100%', maxWidth: `${width}px`, height: 0, paddingBottom: '150%', borderRadius: '6px', backgroundColor: C.rule }} />
   ) : (
     <div style={{ width, height: h, borderRadius: '6px', backgroundColor: C.rule }} />
   );
@@ -87,10 +95,11 @@ function AddedGrid({ items, image }: { items: DigestItem[]; image: DigestEmailPr
           {[0, 1, 2].map((j) => {
             const it = row[j];
             return (
-              <Column key={j} style={{ width: '33.33%', verticalAlign: 'top', paddingRight: j < 2 ? '12px' : 0 }}>
+              // Two 12px gaps shared so every column loses 8px and the posters stay the same size.
+              <Column key={j} style={{ width: '33.33%', verticalAlign: 'top', padding: ['0 8px 0 0', '0 4px', '0 0 0 8px'][j] }}>
                 {it && (
                   <>
-                    <Poster item={it} image={image} width={160} />
+                    <Poster item={it} image={image} width={160} fluid />
                     <Text style={{ margin: '8px 0 0', fontSize: '14px', lineHeight: '19px', fontWeight: 600, color: C.ink }}>{it.title}</Text>
                     {it.detail && <Text style={{ margin: '2px 0 0', fontSize: '13px', lineHeight: '18px', color: C.ink3 }}>{it.detail}</Text>}
                   </>
