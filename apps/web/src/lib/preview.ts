@@ -78,11 +78,11 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&
  * the person would get. Injected into the preview only, never into a sent email.
  */
 export function withPreviewStrip(html: string, subject: string, note: string | null): string {
-  const strip = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;line-height:19px;background:#1d1e22;color:#e7e4dd;padding:10px 16px;border-bottom:1px solid #34353b">
+  const strip = `<div style="font-family:system-ui,sans-serif;font-size:13px;line-height:19px;background:#1d1e22;color:#e7e4dd;padding:10px 16px;border-bottom:1px solid #34353b">
 <div><span style="color:#9a968e">Subject</span>&nbsp; ${esc(subject)}</div>${note ? `<div style="margin-top:4px;color:#f0c66b">${esc(note)}</div>` : ''}</div>`;
   return html.replace(/<body([^>]*)>/, (m) => `${m}${strip}`);
 }
 
 export function emptyPreview(message: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#0c0c0e;color:#d9d4c9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"><p style="max-width:440px;margin:80px auto;padding:0 24px;font-size:15px;line-height:23px;text-align:center">${esc(message)}</p></body></html>`;
+  return `<!doctype html><html><body style="margin:0;background:#0c0c0e;color:#d9d4c9;font-family:system-ui,sans-serif"><p style="max-width:440px;margin:80px auto;padding:0 24px;font-size:15px;line-height:23px;text-align:center">${esc(message)}</p></body></html>`;
 }
