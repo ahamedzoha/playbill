@@ -8,6 +8,8 @@ import { nextOccurrence } from '@playbill/core/schedule';
 import { getSetting } from '@playbill/core/settings';
 import { DigestControls, DigestForm, DigestPreview } from '@/components/digest-controls';
 import { ArrivalsControls } from '@/components/arrivals-controls';
+import { RecapControls } from '@/components/recap-controls';
+import { ensureRecapCampaign } from '@playbill/core/recap';
 import { arrivalsSettings, ensureArrivalsCampaign, pendingArrivalsCount } from '@playbill/core/arrivals';
 import { segmentOf } from '@playbill/core/people/segments';
 import { preferences } from '@playbill/core/db/schema';
@@ -63,6 +65,7 @@ export default async function NewslettersPage() {
     .map(({ id, name }) => ({ id, name }));
 
   const ac = ensureArrivalsCampaign(d);
+  const rc = ensureRecapCampaign(d);
   const as = arrivalsSettings.parse(ac.settings);
   const prefs = new Map(d.select().from(preferences).all().filter((p) => p.topic === 'arrivals').map((p) => [p.plexUserId, p.subscribed]));
   const nowTs = Date.now();
@@ -154,6 +157,16 @@ export default async function NewslettersPage() {
             />
           </section>
 
+          <section aria-labelledby="recap" className="rounded-xl border border-rule bg-sheet p-5 sm:p-6">
+            <h2 id="recap" className="text-lg font-semibold tracking-[-0.01em]">
+              Monthly recap
+            </h2>
+            <p className="mt-1 mb-5 max-w-[70ch] text-sm text-ink-2">
+              On the 1st at 10 am, each person who watched something gets their own month: hours, the evenings they watched most, their top titles and anything they didn't finish. Only they see their numbers.
+            </p>
+            <RecapControls enabled={rc.enabled} mode={rc.mode} emailReady={emailReady} />
+          </section>
+
           <section className="rounded-xl border border-rule bg-sheet">
             <h2 className="px-5 pt-5 pb-4 text-lg font-semibold tracking-[-0.01em] sm:px-6">Sent so far</h2>
             {history.length === 0 ? (
@@ -176,7 +189,7 @@ export default async function NewslettersPage() {
                       <tr key={r.id} className="border-b border-rule last:border-b-0">
                         <td className="num py-2.5 pr-3 pl-5 text-ink-2 sm:pl-6">{dateTime(r.createdAt, tz)}</td>
                         <td className="py-2.5 pr-3">
-                          {kindOf.get(r.campaignId) === 'arrivals' ? 'Arrivals' : 'Digest'}
+                          {({ arrivals: 'Arrivals', recap: 'Recap', lifecycle: 'Account notice', digest: 'Digest' } as Record<string, string>)[kindOf.get(r.campaignId) ?? 'digest']}
                           <span className="block text-xs text-ink-3">{r.trigger === 'test' ? 'Test' : r.trigger === 'manual' ? 'Sent by hand' : 'Scheduled'}</span>
                         </td>
                         <td className="py-2.5 pr-3">

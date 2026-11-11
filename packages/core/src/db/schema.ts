@@ -284,7 +284,7 @@ export const suppressions = sqliteTable('suppressions', {
 
 export const campaigns = sqliteTable('campaigns', {
   id: text('id').primaryKey(),
-  kind: text('kind', { enum: ['digest', 'arrivals', 'lifecycle'] }).notNull(),
+  kind: text('kind', { enum: ['digest', 'arrivals', 'lifecycle', 'recap'] }).notNull(),
   name: text('name').notNull(),
   topic: text('topic').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),

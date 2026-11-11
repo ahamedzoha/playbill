@@ -155,3 +155,38 @@ export async function sendArrivalsTest(): Promise<FormState> {
     return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Monthly recap
+
+import { ensureRecapCampaign } from '@playbill/core/recap';
+
+export async function setRecapState(input: { enabled?: boolean; mode?: 'test' | 'live' }): Promise<FormState> {
+  try {
+    const o = await owner();
+    const d = db();
+    const c = ensureRecapCampaign(d);
+    d.update(campaigns).set({ ...input, updatedAt: Date.now() }).where(eq(campaigns.id, c.id)).run();
+    audit(d, { actor: o.username, action: 'recap.state', target: c.id, before: { enabled: c.enabled, mode: c.mode }, after: input });
+    revalidatePath('/newsletters');
+    return { ok: true, message: 'Saved' };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+export async function sendRecapTest(): Promise<FormState> {
+  try {
+    const o = await owner();
+    const d = db();
+    const c = ensureRecapCampaign(d);
+    const run = createRun(d, c, 'test', `test:${Date.now()}`);
+    if (!run) return { ok: false, message: 'Try again in a moment.' };
+    new Queue(d).enqueue('campaign.run', { runId: run.id }, { dedupeKey: `run:${run.id}` });
+    audit(d, { actor: o.username, action: 'recap.send.test', target: run.id });
+    revalidatePath('/newsletters');
+    return { ok: true, message: "Test on its way: last month's recap, yours if you watched, otherwise a sample." };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
+  }
+}

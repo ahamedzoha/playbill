@@ -4,6 +4,7 @@ import { audit } from './audit';
 import type { Db } from './db';
 import { admins, campaigns, deliveries, people, runs } from './db/schema';
 import { type DigestContent, type DigestSources, buildDigest, isEmptyDigest } from './digest';
+import { buildRecap, recapRecipients, type RecapContent } from './recap';
 import { newId } from './ids';
 import { errorMessage, logger } from './log';
 import { type MailProvider, type OutgoingEmail, PermanentSendError, QuotaExceededError } from './mail';
@@ -190,6 +191,14 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
 
   if (run.status === 'done' || run.status === 'skipped' || run.status === 'failed') return { status: run.status, sent: 0, failed: 0 };
 
+  if (run.status === 'planned' && campaign.kind === 'recap') {
+    const tz = getSetting(db, 'general')?.timezone ?? process.env.TZ ?? 'UTC';
+    const content = buildRecap(db, now(), tz);
+    setRun(db, run.id, { status: Object.keys(content.people).length ? 'frozen' : 'skipped', content: content as unknown as Record<string, unknown>, note: Object.keys(content.people).length ? null : 'Nobody watched anything last month' });
+    if (!Object.keys(content.people).length) return { status: 'skipped', sent: 0, failed: 0 };
+    run = { ...run, status: 'frozen', content: content as unknown as Record<string, unknown> };
+  }
+
   if (run.status === 'planned' && isDigest) {
     const settings = campaignSettings(campaign);
     const until = now();
@@ -211,11 +220,17 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
   if (run.status === 'frozen' || run.status === 'deferred') {
     const t = now();
     // Arrivals runs are planned with their deliveries already in place (each person's own items).
-    const recipients = !isDigest
-      ? []
-      : run.trigger === 'test' || campaign.mode === 'test'
-        ? testAudience(db, campaignSettings(campaign).testAddresses)
-        : digestAudience(db, campaign.topic as TopicId).recipients;
+    const testAddresses = (campaign.settings as { testAddresses?: string[] }).testAddresses ?? [];
+    const recipients =
+      campaign.kind === 'recap'
+        ? run.trigger === 'test' || campaign.mode === 'test'
+          ? testAudience(db, testAddresses)
+          : recapRecipients(db, run.content as unknown as RecapContent)
+        : !isDigest
+          ? []
+          : run.trigger === 'test' || campaign.mode === 'test'
+            ? testAudience(db, campaignSettings(campaign).testAddresses)
+            : digestAudience(db, campaign.topic as TopicId).recipients;
     db.transaction((tx) => {
       for (const r of recipients) {
         tx.insert(deliveries)

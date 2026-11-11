@@ -2,7 +2,8 @@ import { join } from 'node:path';
 import { eq, isNull } from 'drizzle-orm';
 import { type Campaign, advanceRun, campaignSettings } from '@playbill/core/campaigns';
 import { isDryRun, mailer } from '@playbill/core/mail';
-import { renderArrivalsEmail, renderDigestEmail, renderLifecycleEmail } from '@playbill/emails';
+import { renderArrivalsEmail, renderDigestEmail, renderLifecycleEmail, renderRecapEmail } from '@playbill/emails';
+import type { RecapContent } from '@playbill/core/recap';
 import { evaluateLifecycle, executeRemoval, queueLifecycleEmails, type LifecycleContent } from '@playbill/core/lifecycle';
 import { arrivalsSettings, dueArrivals, ensureArrivalsCampaign, planArrivals, reconcileArrivals, type ArrivalsContent } from '@playbill/core/arrivals';
 import { config, logger } from '@playbill/core';
@@ -117,7 +118,7 @@ function renderContext(db: Db, campaign: Campaign) {
       ? campaignSettings(campaign)
       : campaign.kind === 'arrivals'
         ? { ...arrivalsSettings.parse(campaign.settings), subject: '', intro: '' }
-        : { signature: String((campaign.settings as { signature?: string }).signature ?? 'Plex'), subject: '', intro: '' };
+        : { signature: String((campaign.settings as { signature?: string }).signature ?? 'Plex'), subject: '', intro: '' }; // lifecycle, recap
   const general = getSetting(db, 'general');
   const publicUrl = general?.publicUrl ?? (isDryRun() ? 'http://localhost:3000' : null);
   return {
@@ -155,7 +156,9 @@ handlers['campaign.run'] = async (payload, { db, queue, job }) => {
         ? renderArrivalsEmail(content as unknown as ArrivalsContent, ctx, r, id, items)
         : c.kind === 'lifecycle'
           ? renderLifecycleEmail(content as unknown as LifecycleContent, ctx, r, id)
-          : renderDigestEmail(content, ctx, r, id),
+          : c.kind === 'recap'
+            ? renderRecapEmail(content as unknown as RecapContent, ctx, r, id)
+            : renderDigestEmail(content, ctx, r, id),
     pauseMs: 600,
     keepGoing: () => queue.extend(job),
   });

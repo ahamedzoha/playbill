@@ -140,3 +140,37 @@ export async function renderLifecycleEmail(content: LifecycleContent, ctx: { pub
       : {};
   return { to: r.email, toName: r.name, subject: lifecycleSubject(content, ctx.tz), html, text, headers, idempotencyKey: deliveryId };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Monthly recap
+
+import type { RecapContent } from '@playbill/core/recap';
+import { RecapEmail, recapSubject } from './recap';
+
+export { RecapEmail, recapSubject };
+
+/** A person's own recap. Test recipients see their own month if they watched, else a sample. */
+export async function renderRecapEmail(content: RecapContent, ctx: { publicUrl: string; serverName: string; signature: string }, r: Recipient, deliveryId: string): Promise<OutgoingEmail> {
+  const mine = r.plexUserId ? content.people[r.plexUserId] : undefined;
+  const sample = Object.values(content.people).sort((a, b) => b.hours - a.hours)[0];
+  const recap = mine ?? (sample ? { ...sample, name: r.name } : undefined);
+  if (!recap) throw new Error('No recap for this person');
+  const token = preferenceToken(r.plexUserId ?? 'test');
+  const el = createElement(RecapEmail, {
+    recap,
+    monthLabel: content.monthLabel,
+    serverName: ctx.serverName,
+    signature: ctx.signature,
+    links: { preferences: joinUrl(ctx.publicUrl, `/u/${token}`), unsubscribe: joinUrl(ctx.publicUrl, `/u/${token}?unsubscribe=recap`), plex: 'https://app.plex.tv/desktop' },
+  });
+  const [html, text] = await Promise.all([render(el), render(el, { plainText: true })]);
+  return {
+    to: r.email,
+    toName: r.name,
+    subject: recapSubject(content.monthLabel),
+    html,
+    text,
+    headers: { 'List-Unsubscribe': `<${joinUrl(ctx.publicUrl, `/api/unsubscribe/${token}?topic=recap`)}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+    idempotencyKey: deliveryId,
+  };
+}

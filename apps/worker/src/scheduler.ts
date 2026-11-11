@@ -67,7 +67,7 @@ export class Scheduler {
   tickCampaigns(now = Date.now()): void {
     if (!isSetupComplete(this.db)) return;
     const tz = this.timezone();
-    for (const c of this.db.select().from(campaigns).where(eq(campaigns.enabled, true)).all().filter((x) => x.kind === 'digest')) {
+    for (const c of this.db.select().from(campaigns).where(eq(campaigns.enabled, true)).all().filter((x) => x.kind === 'digest' || x.kind === 'recap')) {
       try {
         const due = dueOccurrence(c.cron, tz, c.lastOccurrence ?? c.updatedAt, now);
         if (due.skipped > 0) log.warn(`campaign ${c.name}: skipped ${due.skipped} missed send(s)`);
