@@ -8,6 +8,7 @@ import type { RecapContent } from '@playbill/core/recap';
 import { evaluateLifecycle, executeRemoval, queueLifecycleEmails, type LifecycleContent } from '@playbill/core/lifecycle';
 import { arrivalsSettings, dueArrivals, ensureArrivalsCampaign, planArrivals, reconcileArrivals, type ArrivalsContent } from '@playbill/core/arrivals';
 import { config, logger } from '@playbill/core';
+import { pruneActivity } from '@playbill/core/activity';
 import { pruneSessions } from '@playbill/core/auth';
 import { backupDatabase, dateLabel, pruneBackups } from '@playbill/core/backup';
 import { getFriends, getPendingInvites, getShares, inviteCoversServer } from '@playbill/core/clients/plextv';
@@ -83,7 +84,8 @@ export const handlers: Record<string, Handler> = {
   async maintenance(_payload, { db, queue }) {
     const jobs = queue.prune(Date.now() - 14 * 24 * 3_600_000);
     const sessions = pruneSessions(db);
-    log.info('maintenance done', { jobsPruned: jobs, sessionsPruned: sessions });
+    const activity = pruneActivity(db);
+    log.info('maintenance done', { jobsPruned: jobs, sessionsPruned: sessions, activityPruned: activity.deleted, activityMb: Math.round(activity.bytes / 1_048_576) });
   },
 
   async 'sync.people'(_payload, { db }) {

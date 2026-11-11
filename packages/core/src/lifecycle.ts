@@ -101,15 +101,18 @@ export function evaluateLifecycle(db: Db, now = Date.now()): Evaluation {
       const warning = stretch.find((a) => a.kind === 'warning' && a.status === 'sent');
       if (warning && (warning.deadline ?? 0) <= now && !has('removal', ['awaiting', 'approved', 'done'])) {
         out.removals.push(newAction(db, p, 'removal', 'awaiting', `No plays in ${idle} days, and the warning's deadline passed`, now));
+        audit(db, { actor: 'playbill', action: 'lifecycle.removal.proposed', target: p.plexUserId, after: { idleDays: idle } });
         continue;
       }
     }
     if (idle >= rules.warnDays && !has('warning') && p.email) {
       out.warnings.push(newAction(db, p, 'warning', 'queued', `No plays in ${idle} days`, now, { deadline: now + rules.graceDays * DAY }));
+      audit(db, { actor: 'playbill', action: 'lifecycle.warning.queued', target: p.plexUserId, after: { idleDays: idle, deadline: now + rules.graceDays * DAY } });
       continue;
     }
     if (idle >= rules.nudgeDays && idle < rules.warnDays && !has('nudge') && p.email) {
       out.nudges.push(newAction(db, p, 'nudge', 'queued', `No plays in ${idle} days`, now));
+      audit(db, { actor: 'playbill', action: 'lifecycle.nudge.queued', target: p.plexUserId, after: { idleDays: idle } });
     }
   }
   return out;

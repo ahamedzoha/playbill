@@ -133,8 +133,11 @@ export const auditLog = sqliteTable(
     target: text('target'),
     before: text('before', { mode: 'json' }).$type<unknown>(),
     after: text('after', { mode: 'json' }).$type<unknown>(),
+    /** Derived from action (and outcome) at write time, for the Activity page's filters. See activity.ts classify(). */
+    level: text('level', { enum: ['error', 'warning', 'info'] }).notNull().default('info'),
+    category: text('category', { enum: ['email', 'people', 'library', 'settings', 'system'] }).notNull().default('system'),
   },
-  (t) => [index('audit_at_idx').on(t.at)],
+  (t) => [index('audit_at_idx').on(t.at), index('audit_level_at_idx').on(t.level, t.at), index('audit_category_at_idx').on(t.category, t.at)],
 );
 
 // ---------------------------------------------------------------------------------------------

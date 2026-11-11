@@ -1,6 +1,6 @@
 import { desc, eq } from 'drizzle-orm';
 import Link from 'next/link';
-import { campaignSettings, digestAudience, ensureDigestCampaign, runSummary } from '@playbill/core/campaigns';
+import { campaignSettings, digestAudience, ensureDigestCampaign } from '@playbill/core/campaigns';
 import { campaigns, people, runs } from '@playbill/core/db/schema';
 import { isDryRun } from '@playbill/core/mail';
 import { quotaState } from '@playbill/core/quota';
@@ -23,16 +23,6 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Newsletters' };
 
 const DAYS = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
-
-const STATUS: Record<string, string> = {
-  planned: 'Preparing',
-  frozen: 'Ready to send',
-  sending: 'Sending',
-  done: 'Sent',
-  deferred: 'Waiting',
-  failed: 'Failed',
-  skipped: 'Skipped',
-};
 
 /** Opens the preview panel on this email (the panel sits beside the forms on wide screens, below them on phones). */
 function PreviewLink({ kind }: { kind: string }) {
@@ -67,8 +57,6 @@ export default async function NewslettersPage({ searchParams }: { searchParams: 
   const dry = isDryRun();
   const emailReady = !!email || dry;
   const next = c.enabled ? nextOccurrence(c.cron, tz, Date.now()) : null;
-  const history = d.select().from(runs).orderBy(desc(runs.createdAt)).limit(15).all();
-  const kindOf = new Map(d.select().from(campaigns).all().map((x) => [x.id, x.kind]));
   const previewPeople = d
     .select({ id: people.plexUserId, name: people.displayName, status: people.status })
     .from(people)
@@ -192,48 +180,13 @@ export default async function NewslettersPage({ searchParams }: { searchParams: 
             <RecapControls enabled={rc.enabled} mode={rc.mode} emailReady={emailReady} />
           </section>
 
-          <section className="rounded-xl border border-rule bg-sheet">
-            <h2 className="px-5 pt-5 pb-4 text-lg font-semibold tracking-[-0.01em] sm:px-6">Sent so far</h2>
-            {history.length === 0 ? (
-              <p className="border-t border-rule px-6 py-8 text-ink-2">Nothing sent yet. Send yourself a test to see how it looks in your inbox.</p>
-            ) : (
-              <table className="w-full text-left text-sm">
-                <thead className="border-y border-rule-strong">
-                  <tr className="caps text-ink-3">
-                    <th scope="col" className="py-2.5 pr-3 pl-5 font-semibold sm:pl-6">When</th>
-                    <th scope="col" className="py-2.5 pr-3 font-semibold">Kind</th>
-                    <th scope="col" className="py-2.5 pr-3 font-semibold">Status</th>
-                    <th scope="col" className="py-2.5 pr-6 text-right font-semibold">Sent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((r) => {
-                    const sum = runSummary(d, r.id);
-                    const problems = (sum.failed ?? 0) + (sum.unknown ?? 0);
-                    return (
-                      <tr key={r.id} className="border-b border-rule last:border-b-0">
-                        <td className="num py-2.5 pr-3 pl-5 text-ink-2 sm:pl-6">{dateTime(r.createdAt, tz)}</td>
-                        <td className="py-2.5 pr-3">
-                          {({ arrivals: 'Arrivals', recap: 'Recap', lifecycle: 'Account notice', leaving: 'Leaving soon', digest: 'Digest' } as Record<string, string>)[kindOf.get(r.campaignId) ?? 'digest']}
-                          <span className="block text-xs text-ink-3">{r.trigger === 'test' ? 'Test' : r.trigger === 'manual' ? 'Sent by hand' : 'Scheduled'}</span>
-                        </td>
-                        <td className="py-2.5 pr-3">
-                          <span className={r.status === 'failed' || problems ? 'text-red' : ''}>
-                            {r.status === 'done' && !(sum.sent ?? 0) && problems ? 'Not delivered' : STATUS[r.status]}
-                          </span>
-                          {r.note && <span className="block text-xs text-ink-3">{r.note}</span>}
-                        </td>
-                        <td className="num py-2.5 pr-6 text-right">
-                          {sum.sent ?? 0}
-                          {problems > 0 && <span className="block text-xs text-red">{problems} not delivered</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </section>
+          <p className="text-sm text-ink-2">
+            Every send, test and failure is in{' '}
+            <Link href="/activity?cat=email" className="text-blue hover:underline">
+              Activity
+            </Link>
+            .
+          </p>
         </div>
 
         <section aria-labelledby="preview" className="min-w-0 scroll-mt-6 rounded-xl border border-rule bg-sheet p-5 xl:sticky xl:top-6">

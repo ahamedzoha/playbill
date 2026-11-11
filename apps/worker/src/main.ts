@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config, errorMessage, logger } from '@playbill/core';
+import { audit } from '@playbill/core/audit';
 import { backupDatabase } from '@playbill/core/backup';
 import { crypto } from '@playbill/core/crypto';
 import { getDb, getSqlite, openSqlite } from '@playbill/core/db';
@@ -106,6 +107,8 @@ async function main(): Promise<void> {
         } catch (err) {
           const retry = queue.fail(job, errorMessage(err));
           log.error(`job ${job.type} failed${retry ? ', will retry' : ''}`, { id: job.id, error: errorMessage(err) });
+          // Only the final failure goes in the Activity log; retries would bury it.
+          if (!retry) audit(db, { actor: 'playbill', action: 'job.failed', target: job.type, after: { error: errorMessage(err).slice(0, 2000), attempts: job.attempts + 1 } });
         }
       })();
       busy = run;

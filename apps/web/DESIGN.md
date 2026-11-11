@@ -228,6 +228,7 @@ Motion has one gesture: when the range changes, marks ink in from left to right 
 **Key Characteristics:**
 - One shared weekly scale, drawn as rounded square marks in an ordinal blue ramp, everywhere attendance appears.
 - One state-mark vocabulary for status: filled, half, outline, dotted, dashed, struck, plus the open "not yet joined" slot.
+- Activity events reuse the same square for their level: filled red = error, half red = warning, ink-3 outline = info. Red still means "the owner should look".
 - Flat white sheets with hairline borders on a cool grey paper; shadow only on floating tooltips.
 - Condensed uppercase caps for column heads and tick labels; humanist grotesk for everything a person reads.
 - Tabular figures for every number, so columns of counts and hours align like a ledger.

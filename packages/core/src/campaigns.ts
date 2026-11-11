@@ -181,6 +181,12 @@ function setRun(db: Db, id: string, patch: Partial<Run>) {
  * A crash mid-send: with an idempotent provider the delivery is retried with the same key;
  * otherwise it becomes "unknown" and is left alone (never a duplicate email).
  */
+/** Holds a run for later; logged once when it first starts waiting, not on every hourly retry. */
+function deferRun(db: Db, run: typeof runs.$inferSelect, note: string): void {
+  if (run.status !== 'deferred') audit(db, { actor: 'playbill', action: 'campaign.deferred', target: run.id, after: { note } });
+  setRun(db, run.id, { status: 'deferred', note });
+}
+
 export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<RunResult> {
   const now = deps.now ?? Date.now;
   let run = db.select().from(runs).where(eq(runs.id, runId)).get();
@@ -213,7 +219,7 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
   }
 
   if (!deps.mailer) {
-    setRun(db, run.id, { status: 'deferred', note: 'Email is not set up yet' });
+    deferRun(db, run, 'Email is not set up yet');
     return { status: 'deferred', sent: 0, failed: 0, retryAt: now() + 3_600_000 };
   }
 
@@ -252,7 +258,7 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
         setRun(db, run.id, { status: 'skipped', note: `Not sent: ${pending} emails needed, ${quota.remaining} left in the allowance` });
         return { status: 'skipped', sent: 0, failed: 0 };
       }
-      setRun(db, run.id, { status: 'deferred', note: `Waiting for sending allowance: ${pending} to send, ${quota.remaining} left today` });
+      deferRun(db, run, `Waiting for sending allowance: ${pending} to send, ${quota.remaining} left today`);
       return { status: 'deferred', sent: 0, failed: 0, retryAt: t + 3_600_000 };
     }
     setRun(db, run.id, { status: 'sending', note: null });
@@ -285,7 +291,7 @@ export async function advanceRun(db: Db, runId: string, deps: RunDeps): Promise<
     } catch (err) {
       if (err instanceof QuotaExceededError) {
         db.update(deliveries).set({ status: 'pending', error: errorMessage(err) }).where(eq(deliveries.id, d.id)).run();
-        setRun(db, run.id, { status: 'deferred', note: `The email provider's limit was reached: ${errorMessage(err)}` });
+        deferRun(db, run, `The email provider's limit was reached: ${errorMessage(err)}`);
         return { status: 'deferred', sent, failed, retryAt: now() + 3_600_000 };
       }
       const permanent = err instanceof PermanentSendError || d.attempts + 1 >= 3;

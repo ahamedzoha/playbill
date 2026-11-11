@@ -69,6 +69,13 @@ Still to do in P1: demo mode, so contributors and screenshots don't need a real 
 
 ## P2 Weekly digest, P3 New arrivals, P4 People management (built)
 
+- **Activity** (`/activity`): one stream of every admin action, automatic decision, send and
+  failure, with a level (error, warning, info) and a category. Search with `actor:` `type:`
+  `is:` `action:` tokens, a time range with a volume chart (click a bar to zoom), j/k keys and a
+  live "new events" bar. Each event has its own page: before → after, a send's deliveries and
+  provider events, and what happened around it. Kept for 2 years or 2 GB of log data, whichever
+  comes first (nightly maintenance; oldest first).
+
 - **Email design, "The One-Sheet"** (`packages/emails/DESIGN.md`): every email is printed like a cinema
   poster's billing on an ink field. The digest leads with the week's newest release as a poster
   (cropped and faded into the ink by the image proxy), then a two-tier poster grid; every title in
